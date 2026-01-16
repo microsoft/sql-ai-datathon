@@ -21,4 +21,4 @@ Learn how to design and implement sophisticated AI workflows that coordinate mul
 ## Next Steps
 After completing this mission, you will have built a robust AI orchestration layer that can handle complex scenarios by integrating SQL data operations with AI capabilities.
 
-Proceed to [Mission 4: Building a Full-Stack AI Application](../mission4/README.md) to learn how to create a complete application that leverages the workflows you've built in this mission.
+Proceed to [Mission 4: Building a Full-Stack AI Application](/missions/mission4/README.md) to learn how to create a complete application that leverages the workflows you've built in this mission.

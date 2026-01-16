@@ -14,4 +14,4 @@ You will be guided through implementing semantic search capabilities using embed
 
 ## Next Steps
 After completing this mission, you will have implemented a semantic search solution that can find relevant information based on meaning rather than just keywords.
-Proceed to [Mission 2: Retrieval Augmented Generation (RAG)](../mission2/README.md) to learn how to build an end-to-end RAG pipeline that combines embeddings with language model generation.
+Proceed to [Mission 2: Retrieval Augmented Generation (RAG)](/missions/mission2/README.md) to learn how to build an end-to-end RAG pipeline that combines embeddings with language model generation.

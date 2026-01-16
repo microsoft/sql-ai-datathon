@@ -22,4 +22,4 @@ The techniques learned here enable you to build chatbots, knowledge assistants, 
 
 ## Next Steps
 After completing this mission, you will have implemented a robust RAG pipeline that can answer questions based on your SQL data.
-Proceed to [Mission 3: Orchestrate SQL + AI workflows](../mission3/README.md) to learn how to build complex, multi-step AI workflows that integrate RAG with other SQL and AI capabilities.
+Proceed to [Mission 3: Orchestrate SQL + AI workflows](/missions/mission3/README.md) to learn how to build complex, multi-step AI workflows that integrate RAG with other SQL and AI capabilities.
