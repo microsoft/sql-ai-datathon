@@ -9,16 +9,16 @@ You'll add your own creative twist in the Open Hack and be eligible for judging 
 ## Quick Start
 1. Fork this repo.
 2. Open in Codespaces or local devcontainer.
-3. Run `scripts/...` to populate sample data.
-4. Commit a change to trigger **Mission 1** CI; fix any failing tests.
-5. Repeat for Missions 2 & 3. Use Week 4 to improve the app.
+3. Run `setup/...` to populate sample data.
+4. Complete the challenges and commit a changes to trigger Mission CI
+5. Repeat for Missions 2, 3, 4.
 
 ## Mission Briefs
 1. [Embeddings & Search](missions/mission1/README.md)
 2. [Retrieval Augmented Generation (RAG)](missions/mission2/README.md)
 3. [Orchestrate SQL + AI workflows in C# or Python](missions/mission3/README.md)
 4. [Building a Full-Stack AI Application in C# or Python](missions/mission4/README.md)
-7. [Open Hack]()
+5. [Open Hack]()
 
 ## What you’ll build
 - Embeddings & search 
@@ -30,9 +30,15 @@ You'll add your own creative twist in the Open Hack and be eligible for judging 
 - README clarity & reproducibility
 - Creativity, impact, and alignment with SQL + AI objectives
 
-# How to Submit
+# How to Submit for a Datathon Completion Badge 
+1. Ensure all mission workflows passed on your repo.
+2. Open an Issue on [this repo](https://github.com/your-repo-link) using the “Badge Submission” template.
+3. Paste links to:
+   - Issue with all successful workflow runs.
+
+# How to Submit for a Badge with and Open Hack Entry
 1. Ensure all mission workflows passed on your repo.
 2. Open an Issue on [this repo](https://github.com/your-repo-link) using the “Final Submission” template.
 3. Paste links to:
-   - Latest successful workflow runs
-   - Repo README and any demo instructions
+   - Issue with all successful workflow runs.
+   - Entry README and any demo instructions

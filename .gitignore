@@ -416,3 +416,10 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Azurite storage emulator files
+__azurite_db_*.json
+__blobstorage__/
+__queuestorage__/
+__tablestorage__/
+walmart-product-with-embeddings-dataset-usa.csv

@@ -1,0 +1,19 @@
+{
+  "name": "sql-ai-datathon",
+  "version": "1.0.0",
+  "description": "SQL AI Starter repository for Microsoft Datathons",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/microsoft/sql-ai-datathon.git"
+  },
+  "author": "Jasmine Greenaway (paladique)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/microsoft/sql-ai-datathon/issues"
+  },
+  "homepage": "https://github.com/microsoft/sql-ai-datathon#readme"
+}

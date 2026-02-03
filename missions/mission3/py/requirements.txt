@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+mssql-python
+python-dotenv
+langchain
+langchain-azure-ai
