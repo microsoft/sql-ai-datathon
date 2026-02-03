@@ -8,8 +8,7 @@ Complete all four missions to level up your skills, and add your own creative tw
 ## Quick Start
 1. Fork this repo.
 2. Open in Codespaces or local devcontainer.
-3. Run `setup/...` to populate sample data.
-4. Complete the challenges and repeat for Missions 2, 3, 4.
+3. Complete the challenges and repeat for Missions 2, 3, 4.
 
 ## Mission Briefs
 1. [Embeddings & Search](missions/mission1)
