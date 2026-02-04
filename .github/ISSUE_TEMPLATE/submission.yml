@@ -1,0 +1,43 @@
+name: Project Submission
+description: "Share your project with us to win a ticket to SQLCon 2026!"
+title: "Project: <short description>"
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Project name
+      description: Name of your project
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide a short description of your project. What is it about? What type of app have you built? What is it doing? What problem is it solving?
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Type
+      description: What type of app is it?
+      options:
+        - Semantic Search
+        - Chat App
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Project Repository URL
+      description: URL of the GitHub repo with your project
+    validations:
+      required: true
+  - type: input
+    id: video
+    attributes:
+      label: Project video (please verify that the link works)
+      description: A short demo video of your project
+    validations:
+      required: true
