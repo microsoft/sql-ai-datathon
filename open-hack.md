@@ -28,7 +28,6 @@ Ask the bot about a product, and it fetches details from the SQL database before
 
 
 
-
 ### Option 2: Semantic Search Tool
 Build a search experience that allows users to enter natural language queries and receive relevant results from a Microsoft SQL database.
 What this should demonstrate:
@@ -122,12 +121,17 @@ If you feel stuck, simplify. A clear, working RAG flow is better than a complex,
 
 
 ## What We’re Looking For
-Judging will focus on:
 
-- Clear grounding of AI responses in SQL data
-- Focused scope and strong execution
-- Clean, understandable documentation
-- Practical and realistic use of SQL + AI patterns
+Judging will focus on four key areas:
+
+| Criteria | What Judges Look For |
+|----------|---------------------|
+| **Problem Understanding** | Clear project type (Chatbot or Search), SQL as data source, proper RAG implementation |
+| **Innovation & Creativity** | Original approach, creative use of embeddings/semantic search, unique UX or data usage |
+| **Technical Execution** | Sound implementation, reproducible setup, focused scope, clear documentation |
+| **Insight & Impact** | Meaningful outcomes, depth of analysis, real-world applicability |
+
+> **Tip:** A simple, well-executed RAG flow beats a complex, incomplete solution.
 
 ## Ready to Get Started?
 Good luck, and happy building!

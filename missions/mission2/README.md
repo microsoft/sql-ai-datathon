@@ -20,13 +20,20 @@ You will be guided through implementing retrieval augmented generation (RAG) cap
 ## Walkthrough
 
 ### Chatting with Data
-- In `06-chat-with-data.sql`, replace the placeholders with your endpoints and actual Foundry resource name if using Microsoft Foundry.
+- In `01-chat-with-data.sql`, replace the placeholders with your endpoints and actual Foundry resource name if using Microsoft Foundry.
 - Run the script to see how the RAG pipeline retrieves relevant products from the database and generates a response based on the user's request.
 
 ### Structured Output from Chat
-- In `07-chat-with-data-structured-output.sql`, replace the placeholders with your endpoints and actual Foundry resource name if using Microsoft Foundry.
+- In `02-chat-with-data-structured-output.sql`, replace the placeholders with your endpoints and actual Foundry resource name if using Microsoft Foundry.
 - Run the script to see how to prompt the language model to return structured JSON output based on the retrieved data.
+
+### Setting up Stored Procedures
+- In `03-setup-stored-procedures.sql`, run the script to create stored procedures that encapsulate the RAG logic for easier reuse.
+
+You can test the stored procedures using the provided sample calls in the script.
+
 
 ## Next Steps
 After completing this mission, you will have implemented a robust RAG pipeline that can answer questions based on your SQL data.
-Proceed to [Mission 3: Orchestrate SQL + AI workflows](/missions/mission3/README.md) to learn how to build complex, multi-step AI workflows that integrate RAG with other SQL and AI capabilities.
+
+Proceed to [Mission 3: Orchestrate SQL + AI workflows](missions/mission3/README.md) to learn how to build complex, multi-step AI workflows that integrate RAG with other SQL and AI capabilities.

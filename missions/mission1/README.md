@@ -15,9 +15,11 @@ You will be guided through implementing semantic search capabilities using embed
 ### Create a SQL Database
 
 You have a few options to create an SQL Database, click one of the links below for instructions:
-- [Azure SQL Database instance](https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal)
 - [Local SQL Server instance with SQL Server 2025 or later, use the free developer edition](https://learn.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver17#installation-media)
+- [Local SQL Server Container with Visual Studio Code extension](https://learn.microsoft.com/en-us/sql/tools/visual-studio-code-extensions/mssql/mssql-local-container?view=sql-server-ver17)
 - [Docker container with SQL Server 2025 or later](https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver17&preserve-view=true&tabs=cli&pivots=cs1-bash)
+- [Azure SQL Database instance](https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal)
+
 
 ## Setting Up the Database
 
@@ -48,11 +50,11 @@ The recommended completion models for this mission are as follows:
 ## Store Database Scope Credentials
 You'll add your model provider credentials to the database scope for secure access.
 
-- Run the `03-add-database-scope-credentials.sql` script, replacing placeholders with your actual credentials.
+- Run the `[03-add-database-scope-credentials.sql](03-add-database-scope-credentials.sql)` script, replacing placeholders with your actual credentials.
 
 ## Your First Semantic Search
-- Replace the placeholders in the `04-get-search-vector.sql` script with your actual search terms and run the script to turn the search query into a vector.
-- Next, run the `05-get-similar-items.sql` script to perform your first semantic search query using vector similarity.
+- Replace the placeholders in the `[04-get-search-vector.sql](04-get-search-vector.sql)` script with your actual search terms and run the script to turn the search query into a vector.
+- Next, run the `[05-get-similar-items.sql](05-get-similar-items.sql)` script to perform your first semantic search query using vector similarity.
 - Modify the query to test different search terms and observe the results.
 
 ## Test your Semantic Search
@@ -61,4 +63,5 @@ Verify that your semantic search is working correctly by your results from the s
 
 ## Next Steps
 After completing this mission, you will have implemented a semantic search solution that can find relevant information based on meaning rather than just keywords.
-Proceed to [Mission 2: Retrieval Augmented Generation (RAG)](/missions/mission2/README.md) to learn how to build an end-to-end RAG pipeline that combines embeddings with language model generation.
+
+Proceed to [Mission 2: Retrieval Augmented Generation (RAG)](missions/mission2/README.md) to learn how to build an end-to-end RAG pipeline that combines embeddings with language model generation.

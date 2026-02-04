@@ -1,17 +1,24 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import dotenv
 import mssql_python
 from langchain_azure_ai.chat_models import AzureAIChatCompletionsModel
-from langchain.schema import HumanMessage, SystemMessage
+from langchain.messages import HumanMessage, SystemMessage
 import json
+import os
+import httpx
+
+# DAB API URL
+DAB_URL = "http://localhost:5000"
 
 # Load environment variables
 dotenv.load_dotenv("../.env")
 
 connection_string = dotenv.get_key("../.env", "SERVER_CONNECTION_STRING")
-endpoint = dotenv.get_key("../.env", "MODEL_ENDPOINT_URL")
+endpoint = dotenv.get_key("../.env", "MODEL_ENDPOINT_URL") or dotenv.get_key("../.env", "AZURE_OPENAI_ENDPOINT")
 api_key = dotenv.get_key("../.env", "MODEL_API_KEY")
 
 # Initialize FastAPI app
@@ -24,7 +31,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -72,22 +79,28 @@ def find_products(search_term: str) -> str:
     cursor = connection.cursor()
     
     sql = """SET NOCOUNT ON;
-    DECLARE @out nvarchar(max);
-    EXEC [dbo].[get_similar_items] @inputText = ?, @error = @out OUTPUT;
-    SELECT @out AS error;"""
+    DECLARE @result nvarchar(max);
+    DECLARE @error nvarchar(max);
+    EXEC [dbo].[get_similar_items] @inputText = ?, @result = @result OUTPUT, @error = @error OUTPUT;
+    SELECT @result AS result, @error AS error;"""
     
     cursor.execute(sql, (search_term,))
     results = []
     
     while True:
         rows = cursor.fetchall()
-        results.extend(rows)
+        if cursor.description:
+            columns = [desc[0] for desc in cursor.description]
+            for row in rows:
+                row_dict = dict(zip(columns, row))
+                if row_dict.get('result'):
+                    return row_dict['result']
         if not cursor.nextset():
             break
     
     cursor.close()
     connection.close()
-    return str(results)
+    return str(results) if results else "[]"
 
 
 # =============================================================================
@@ -100,56 +113,79 @@ def health_check():
     return {"status": "healthy", "service": "SQL AI API"}
 
 
+@app.get("/app")
+def serve_frontend():
+    """Serve the frontend application."""
+    frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend", "index.html")
+    if os.path.exists(frontend_path):
+        return FileResponse(frontend_path)
+    raise HTTPException(status_code=404, detail="Frontend not found")
+
+
 @app.get("/api/products")
-def get_products(page: int = 1, page_size: int = 10):
-    """Get paginated list of products."""
-    connection = get_connection()
-    cursor = connection.cursor()
-    
-    offset = (page - 1) * page_size
-    query = f"""
-        SELECT id, item_id, product_name, product_category, price_retail, price_current
-        FROM dbo.walmart_ecommerce_product_details
-        ORDER BY id
-        OFFSET {offset} ROWS FETCH NEXT {page_size} ROWS ONLY
-    """
-    
-    cursor.execute(query)
-    columns = [desc[0] for desc in cursor.description]
-    products = [dict(zip(columns, row)) for row in cursor.fetchall()]
-    
-    cursor.close()
-    connection.close()
-    
-    return {"page": page, "page_size": page_size, "products": products}
+async def get_products(page: int = 1, page_size: int = 10):
+    """Get paginated list of products from DAB."""
+    try:
+        # Use DAB API with cursor-based pagination
+        dab_url = f"{DAB_URL}/api/Products?$first={page_size}"
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(dab_url)
+            response.raise_for_status()
+            data = response.json()
+        
+        # DAB returns products in 'value' array
+        products = data.get("value", [])
+        
+        return {"page": page, "pageSize": page_size, "products": products}
+    except httpx.RequestError as e:
+        raise HTTPException(
+            status_code=503, 
+            detail=f"Error connecting to DAB: {str(e)}. Make sure DAB is running on port 5000."
+        )
 
 
 @app.get("/api/products/search")
-def search_products(query: str) -> ProductSearchResponse:
+def search_products(query: str):
     """Search products using vector similarity."""
     connection = get_connection()
     cursor = connection.cursor()
     
     sql = """SET NOCOUNT ON;
-    DECLARE @out nvarchar(max);
-    EXEC [dbo].[get_similar_items] @inputText = ?, @error = @out OUTPUT;
-    SELECT @out AS error;"""
+    DECLARE @result nvarchar(max);
+    DECLARE @error nvarchar(max);
+    EXEC [dbo].[get_similar_items] @inputText = ?, @result = @result OUTPUT, @error = @error OUTPUT;
+    SELECT @result AS result, @error AS error;"""
     
     cursor.execute(sql, (query,))
-    results = []
+    result_json = None
+    error = None
     
     while True:
         rows = cursor.fetchall()
         if cursor.description:
             columns = [desc[0] for desc in cursor.description]
-            results.extend([dict(zip(columns, row)) for row in rows])
+            for row in rows:
+                row_dict = dict(zip(columns, row))
+                result_json = row_dict.get('result')
+                error = row_dict.get('error')
         if not cursor.nextset():
             break
     
     cursor.close()
     connection.close()
     
-    return ProductSearchResponse(query=query, results=results)
+    if error:
+        raise HTTPException(status_code=500, detail=f"Search error: {error}")
+    
+    if result_json:
+        try:
+            products = json.loads(result_json)
+            return {"query": query, "results": products}
+        except json.JSONDecodeError:
+            return {"query": query, "results": []}
+    
+    return {"query": query, "results": []}
 
 
 @app.post("/api/chat")

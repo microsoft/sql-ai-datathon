@@ -96,7 +96,7 @@ Edit `dab-config.json` to allow requests from the .NET app:
   "runtime": {
     "host": {
       "cors": {
-        "origins": ["http://localhost:5001"],
+        "origins": ["http://localhost:5001", "http://localhost:3000", "http://127.0.0.1:5001", "http://localhost:8000", "http://127.0.0.1:8000"],
         "allow-credentials": true
       },
       "mode": "development"
@@ -128,7 +128,7 @@ Your final configuration should look similar to:
     },
     "host": {
       "cors": {
-        "origins": ["http://localhost:5001"],
+        "origins": ["http://localhost:5001", "http://localhost:3000", "http://127.0.0.1:5001", "http://localhost:8000", "http://127.0.0.1:8000"],
         "allow-credentials": true
       },
       "mode": "development"

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQL AI Product Assistant</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -371,7 +372,9 @@
         let nextPageUrl = null;  // Store DAB's nextLink for cursor pagination
         let pageHistory = [];    // Store URLs for previous pages
 
-        const API_URL = 'http://localhost:5001';
+        // Auto-detect API URL based on current port or default to Python app
+        const currentPort = window.location.port;
+        const API_URL = currentPort === '5001' ? 'http://localhost:5001' : 'http://localhost:8000';
         const DAB_URL = 'http://localhost:5000';
 
         function showPanel(panelId) {
@@ -512,7 +515,10 @@
 
         function escapeHtml(text) {
             const div = document.createElement('div');
-            div.textContent = text;
+             // Render Markdown for assistant messages
+            const formattedContent = marked.parse(text);
+            
+            div.innerHTML = formattedContent;
             return div.innerHTML;
         }
     </script>

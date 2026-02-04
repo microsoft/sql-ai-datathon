@@ -1,88 +1,125 @@
+-- =============================================================================
+-- Mission 1: Load Product Data with Embeddings
+-- =============================================================================
+-- Description: Loads the Walmart product dataset with pre-computed embeddings
+--              from Azure Blob Storage or local file system into the database.
+--
+-- Prerequisites:
+--   - 01-create-table.sql must be executed first
+--   - For Azure Blob Storage: Valid SAS token and storage account
+--   - For local file: CSV file accessible from SQL Server
+--
+-- Configuration:
+--   Replace the following placeholders before running:
+--   - <SAS_TOKEN>: Your Azure Blob Storage SAS token (without leading '?')
+--   - <STORAGE_ACCOUNT>: Your Azure Storage account name
+--   - File path if loading from local file system
+--
+-- Data Source:
+--   walmart-product-with-embeddings-dataset-usa.csv
+--   Contains ~10,000 products with pre-computed 1536-dimensional embeddings
+--
+-- Index Created:
+--   - vec_idx: DISKANN vector index on embedding column for fast similarity search
+-- =============================================================================
+
+
+-- -----------------------------------------------------------------------------
+-- SECTION 1: Prerequisites & Cleanup
+-- -----------------------------------------------------------------------------
 /*
-	Cleanup if needed
-*/
-if not exists(select * from sys.symmetric_keys where [name] = '##MS_DatabaseMasterKey##')
-begin
-	create master key encryption by password = 'Pa$$w0rd!'
-end
-go
-if exists(select * from sys.[external_data_sources] where name = 'openai_playground')
-begin
-	drop external data source [openai_playground];
-end
-go
-if exists(select * from sys.[database_scoped_credentials] where name = 'openai_playground')
-begin
-	drop database scoped credential [openai_playground];
-end
-go
+    Create database scoped credential and external data source.
+    File is assumed to be in a path like: 
+    https://<myaccount>.blob.core.windows.net/playground/walmart/walmart-product-with-embeddings-dataset-usa.csv
 
+    Best Practice: Use Managed Identity instead of SAS tokens when possible.
+    See: https://learn.microsoft.com/en-us/sql/relational-databases/import-export/import-bulk-data-by-using-bulk-insert-or-openrowset-bulk-sql-server
+*/
+
+-- Create master key if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.symmetric_keys WHERE [name] = '##MS_DatabaseMasterKey##')
+BEGIN
+    CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Pa$$w0rd!';
+END
+GO
+
+-- Remove existing external data source if present
+IF EXISTS (SELECT * FROM sys.[external_data_sources] WHERE name = 'openai_playground')
+BEGIN
+    DROP EXTERNAL DATA SOURCE [openai_playground];
+END
+GO
+
+-- Remove existing credential if present
+IF EXISTS (SELECT * FROM sys.[database_scoped_credentials] WHERE name = 'openai_playground')
+BEGIN
+    DROP DATABASE SCOPED CREDENTIAL [openai_playground];
+END
+GO
+
+
+-- -----------------------------------------------------------------------------
+-- SECTION 2: Create External Data Source (Azure Blob Storage)
+-- -----------------------------------------------------------------------------
 /*
-	Create database scoped credential and external data source.
-	File is assumed to be in a path like: 
-	https://<myaccount>.blob.core.windows.net/playground/walmart/walmart-product-with-embeddings-dataset-usa.csv
-
-	Please note that it is recommened to avoid using SAS tokens: the best practice is to use Managed Identity as described here:
-	https://learn.microsoft.com/en-us/sql/relational-databases/import-export/import-bulk-data-by-using-bulk-insert-or-openrowset-bulk-sql-server?view=sql-server-ver16#bulk-importing-from-azure-blob-storage
+    If loading from local file system, skip this section.
+    Replace <SAS_TOKEN> and <STORAGE_ACCOUNT> with your values.
 */
 
+CREATE DATABASE SCOPED CREDENTIAL [openai_playground]
+WITH IDENTITY = 'SHARED ACCESS SIGNATURE',
+     SECRET = '<SAS_TOKEN>'; -- Do not include the leading '?'
+GO
 
-/* If source is from Azure Blob Storage, replace <SAS_TOKEN> and <STORAGE_ACCOUNT> before running this script. 
-	If loading from local file system, you can skip this section. Comment out or remove the lines between the markers.
-*/	
-
-
-create database scoped credential [openai_playground]
-with identity = 'SHARED ACCESS SIGNATURE',
-secret = '<SAS_TOKEN>'; -- make sure not to include the ? at the beginning
-go
-
-
-create external data source [openai_playground]
-with 
+CREATE EXTERNAL DATA SOURCE [openai_playground]
+WITH 
 ( 
-	type = blob_storage,
- 	location = 'https://<STORAGE_ACCOUNT>.blob.core.windows.net/sample-data', -- replace <STORAGE_ACCOUNT> with your storage account name
- 	credential = [openai_playground]
+    TYPE = BLOB_STORAGE,
+    LOCATION = 'https://<STORAGE_ACCOUNT>.blob.core.windows.net/sample-data',
+    CREDENTIAL = [openai_playground]
 );
-go
-/* End of external data source creation */
+GO
 
 
-/*
-	Test access to the file
-*/
-
-
+-- -----------------------------------------------------------------------------
+-- SECTION 3: Validate File Access
+-- -----------------------------------------------------------------------------
 SELECT * FROM OPENROWSET(
-    BULK 'walmart-product-with-embeddings-dataset-usa.csv', -- if loading from local file system, replace with your file path ie: C:\data\walmart-product-with-embeddings-dataset-usa.csv
+    BULK 'walmart-product-with-embeddings-dataset-usa.csv',
     DATA_SOURCE = 'openai_playground',
     SINGLE_CLOB
 ) AS test;
 
-/*
-    Import data
-*/
-bulk insert dbo.[walmart_ecommerce_product_details]
-from 'walmart-product-with-embeddings-dataset-usa.csv' -- if loading from local file system, replace with your file path ie: C:\data\walmart-product-with-embeddings-dataset-usa.csv
-with (
-	data_source = 'openai_playground', -- if loading from local file system, remove or comment this line
-    format = 'csv',
-    firstrow = 2,
-    codepage = '65001',
-	fieldterminator = ',',
-	rowterminator = '0x0a',
-    fieldquote = '"',
-    batchsize = 1000,
-    tablock
-)
-go
 
+-- -----------------------------------------------------------------------------
+-- SECTION 4: Import Product Data
+-- -----------------------------------------------------------------------------
 /*
-	Add indexes
+    For local file system: Replace path and remove DATA_SOURCE parameter
+    Example: 'C:\data\walmart-product-with-embeddings-dataset-usa.csv'
 */
 
+BULK INSERT dbo.[walmart_ecommerce_product_details]
+FROM 'walmart-product-with-embeddings-dataset-usa.csv'
+WITH (
+    DATA_SOURCE = 'openai_playground',
+    FORMAT = 'CSV',
+    FIRSTROW = 2,
+    CODEPAGE = '65001',
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '0x0a',
+    FIELDQUOTE = '"',
+    BATCHSIZE = 1000,
+    TABLOCK
+);
+GO
+
+
+-- -----------------------------------------------------------------------------
+-- SECTION 5: Create Vector Index for Similarity Search
+-- -----------------------------------------------------------------------------
 CREATE VECTOR INDEX vec_idx
 ON dbo.walmart_ecommerce_product_details(embedding)
 WITH (METRIC = 'COSINE', TYPE = 'DISKANN');
 GO
+

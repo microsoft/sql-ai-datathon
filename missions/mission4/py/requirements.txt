@@ -1,7 +1,8 @@
 fastapi
-uvicorn[standard]
+uvicorn
 python-dotenv
 mssql-python
 langchain
 langchain-azure-ai
 pydantic
+httpx

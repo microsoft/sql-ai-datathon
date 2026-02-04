@@ -14,12 +14,15 @@ if (Test-Path $envFile) {
     Write-Host "⚠️ .env file not found at $envFile" -ForegroundColor Yellow
 }
 
-# Get current directory (dotnet folder)
-$dotnetDir = $PSScriptRoot
+# Get current directory (dotnet folder) - handle both script and interactive execution
+$dotnetDir = if ($PSScriptRoot) { $PSScriptRoot } else { Get-Location }
 
-# Start DAB in background (runs from current dotnet folder)
+# Get mission4 directory (where dab-config.json is located)
+$mission4Dir = Join-Path $dotnetDir ".."
+
+# Start DAB in background (runs from mission4 folder)
 Write-Host "Starting DAB on port 5000..." -ForegroundColor Cyan
-$dabProcess = Start-Process -FilePath "dab" -ArgumentList "start" -WorkingDirectory $dotnetDir -PassThru -WindowStyle Minimized
+$dabProcess = Start-Process -FilePath "dab" -ArgumentList "start" -WorkingDirectory $mission4Dir -PassThru -WindowStyle Minimized
 
 # Wait for DAB to start
 Start-Sleep -Seconds 3

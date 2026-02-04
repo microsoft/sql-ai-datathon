@@ -1,26 +1,59 @@
-/*
-    Store credentials to access the HTTP endpoint
-*/ 
+-- =============================================================================
+-- Mission 1: Configure HTTP Credentials for Azure OpenAI
+-- =============================================================================
+-- Description: Creates database-scoped credentials for secure access to Azure
+--              OpenAI endpoints. These credentials are used by sp_invoke_external_rest_endpoint
+--              to authenticate API calls for embedding generation.
+--
+-- Prerequisites:
+--   - Azure OpenAI resource deployed with text-embedding-ada-002 model
+--   - API key or Managed Identity configured
+--
+-- Configuration:
+--   Replace the following placeholders:
+--   - <OPENAI_URL>: Your Azure OpenAI endpoint URL (e.g., https://myresource.openai.azure.com)
+--   - <OPENAI_API_KEY>: Your Azure OpenAI API key
+--
+-- Security Options:
+--   1. API Key Authentication (shown below)
+--   2. Managed Identity (recommended for production - see commented section)
+--
+-- Usage:
+--   Run once after database creation, before executing search queries
+-- =============================================================================
 
-if not exists(select * from sys.database_scoped_credentials where [name] = '<OPENAI_URL>')
-begin
-    create database scoped credential [<OPENAI_URL>]
-    with identity = 'HTTPEndpointHeaders', secret = '{"api-key":"<OPENAI_API_KEY>"}';
-end
-go
 
+-- -----------------------------------------------------------------------------
+-- SECTION 1: Create HTTP Credentials (API Key Method)
+-- -----------------------------------------------------------------------------
+IF NOT EXISTS (SELECT * FROM sys.database_scoped_credentials WHERE [name] = '<OPENAI_URL>')
+BEGIN
+    CREATE DATABASE SCOPED CREDENTIAL [<OPENAI_URL>]
+    WITH IDENTITY = 'HTTPEndpointHeaders', 
+         SECRET = '{"api-key":"<OPENAI_API_KEY>"}';
+END
+GO
+
+
+-- -----------------------------------------------------------------------------
+-- SECTION 2: Alternative - Managed Identity (Recommended for Production)
+-- -----------------------------------------------------------------------------
 /*
-    Even better, use Managed Identity if you can, as explained here:
+    Use Managed Identity for passwordless authentication. More info:
     https://devblogs.microsoft.com/azure-sql/go-passwordless-when-calling-azure-openai-from-azure-sql-using-managed-identities/
 
-if not exists(select * from sys.database_scoped_credentials where [name] = '<OPENAI_URL>')
-begin
-    create database scoped credential [<OPENAI_URL>]
-    with identity = 'Managed Identity', secret = '{"resourceid":"https://cognitiveservices.azure.com"}';
-end
-go
-
+    IF NOT EXISTS (SELECT * FROM sys.database_scoped_credentials WHERE [name] = '<OPENAI_URL>')
+    BEGIN
+        CREATE DATABASE SCOPED CREDENTIAL [<OPENAI_URL>]
+        WITH IDENTITY = 'Managed Identity', 
+             SECRET = '{"resourceid":"https://cognitiveservices.azure.com"}';
+    END
+    GO
 */
 
-select * from sys.database_scoped_credentials where [name] = '<OPENAI_URL>'
-go
+
+-- -----------------------------------------------------------------------------
+-- SECTION 3: Verify Credentials
+-- -----------------------------------------------------------------------------
+SELECT * FROM sys.database_scoped_credentials WHERE [name] = '<OPENAI_URL>';
+GO
