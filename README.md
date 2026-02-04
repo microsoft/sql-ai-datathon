@@ -8,13 +8,14 @@ Complete all four missions to level up your skills, and add your own creative tw
 ## Quick Start
 1. Fork this repo.
 2. Open in Codespaces or local devcontainer.
-3. Complete the challenges and repeat for Missions 2, 3, 4.
+3. Complete the missions and repeat for Missions 2, 3, 4.
+4. Learn how to submit an entry for the Open Hack project in [`open-hack.md`](open-hack.md).
 
 ## Mission Briefs
-1. [Embeddings & Search](missions/mission1)
-2. [Retrieval Augmented Generation (RAG)](missions/mission2)
-3. [Orchestrate SQL + AI workflows in C# or Python](missions/mission3)
-4. [Building a Full-Stack AI Application in C# or Python](missions/mission4)
+1. [Embeddings & Search](missions/mission1/README.md) ([folder](missions/mission1))
+2. [Retrieval Augmented Generation (RAG)](missions/mission2/README.md) ([folder](missions/mission2))
+3. [Orchestrate SQL + AI workflows in C# or Python](missions/mission3/README.md) ([folder](missions/mission3))
+4. [Building a Full-Stack AI Application in C# or Python](missions/mission4/README.md) ([folder](missions/mission4))
 5. [Open Hack](open-hack.md)
 
 ## What you’ll build

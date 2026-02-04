@@ -157,10 +157,12 @@ SET @prompt = JSON_MODIFY(@prompt, '$.response_format', JSON_QUERY(@js));
 -- -----------------------------------------------------------------------------
 -- SECTION 5: Call Azure OpenAI Chat Completion API
 -- -----------------------------------------------------------------------------
+-- NOTE: This uses the gpt5-mini model. To use a different model, update "gpt5-mini" in the URL below
+-- and in any other files that reference it (e.g., mission3 notebooks, mission4 apps).
 DECLARE @retval INT, @response NVARCHAR(MAX);
 
 EXEC @retval = sp_invoke_external_rest_endpoint
-    @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2024-12-01-preview',
+    @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt5-mini/chat/completions?api-version=2024-12-01-preview',
     @headers = '{"Content-Type":"application/json"}',
     @method = 'POST',
     @credential = [https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/],

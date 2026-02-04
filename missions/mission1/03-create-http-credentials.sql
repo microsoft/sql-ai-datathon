@@ -6,7 +6,7 @@
 --              to authenticate API calls for embedding generation.
 --
 -- Prerequisites:
---   - Azure OpenAI resource deployed with text-embedding-ada-002 model
+--   - Azure OpenAI resource deployed with text-embedding-3-small model
 --   - API key or Managed Identity configured
 --
 -- Configuration:

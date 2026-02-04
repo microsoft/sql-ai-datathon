@@ -2,7 +2,7 @@
 -- Mission 1: Generate Search Query Embedding
 -- =============================================================================
 -- Description: Transforms a natural language search query into a vector embedding
---              using Azure OpenAI's text-embedding-ada-002 model. The resulting
+--              using Azure OpenAI's text-embedding-3-small model. The resulting
 --              vector is stored in a temporary table for use in similarity searches.
 --
 -- Prerequisites:
@@ -47,7 +47,7 @@ SET @payload = JSON_OBJECT('input': @text);
 -- -----------------------------------------------------------------------------
 BEGIN TRY
     EXEC @retval = sp_invoke_external_rest_endpoint
-        @url = '<OPENAI_URL>/openai/deployments/text-embedding-ada-002/embeddings?api-version=2023-03-15-preview',
+        @url = '<OPENAI_URL>/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-03-15-preview',
         @method = 'POST',
         @credential = [https://<OPENAI_URL>.openai.azure.com],
         @payload = @payload,

@@ -58,7 +58,6 @@ DECLARE @qv VECTOR(1536) = (
 -- SECTION 3: Execute Vector Similarity Search
 -- -----------------------------------------------------------------------------
 SELECT TOP (10) 
-    
     w.id,
     w.product_name,
     w.description,

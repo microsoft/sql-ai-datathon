@@ -5,7 +5,7 @@
 --              and vector similarity search logic for the RAG pipeline.
 --
 -- Prerequisites:
---   - Azure OpenAI endpoint configured with text-embedding-ada-002
+--   - Azure OpenAI endpoint configured with text-embedding-3-small
 --   - Database-scoped credentials created
 --   - Product table with embeddings populated
 --
@@ -24,7 +24,7 @@ STORED PROCEDURE: dbo.get_embedding
 ================================================================================
 Description:
     Generates a 1536-dimensional vector embedding for input text using 
-    Azure OpenAI's text-embedding-ada-002 model.
+    Azure OpenAI's text-embedding-3-small model.
 
 Parameters:
     @inputText   nvarchar(max)   [IN]  - The text to convert into a vector embedding
@@ -47,7 +47,7 @@ declare @payload nvarchar(max) = json_object('input': @inputText);
 declare @response nvarchar(max)
 begin try
     exec @retval = sp_invoke_external_rest_endpoint
-        @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/text-embedding-ada-002/embeddings?api-version=2023-03-15-preview',
+        @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-03-15-preview',
         @method = 'POST',
         @credential = [https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/],
         @payload = @payload,

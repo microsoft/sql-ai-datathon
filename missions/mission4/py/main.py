@@ -38,10 +38,12 @@ app.add_middleware(
 )
 
 # Initialize AI model
+# NOTE: This uses the gpt5-mini model. To use a different model, update the model name below
+# and in any other files that reference it (e.g., mission3 notebooks, mission2 SQL scripts).
 chat_model = AzureAIChatCompletionsModel(
     endpoint=endpoint,
     credential=api_key,
-    model="gpt-4.1",
+    model="gpt5-mini",
 )
 
 

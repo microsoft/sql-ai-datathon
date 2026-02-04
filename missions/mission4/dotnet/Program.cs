@@ -40,8 +40,10 @@ builder.Services.AddCors(options =>
 });
 
 // Configure Semantic Kernel
+// NOTE: This uses the gpt5-mini model. To use a different model, update the model name below
+// and in any other files that reference it (e.g., mission3 notebooks, mission2 SQL scripts).
 var kernelBuilder = Kernel.CreateBuilder();
-kernelBuilder.AddAzureOpenAIChatCompletion("gpt-4.1", aoaiEndpoint, apiKey);
+kernelBuilder.AddAzureOpenAIChatCompletion("gpt5-mini", aoaiEndpoint, apiKey);
 var kernel = kernelBuilder.Build();
 builder.Services.AddSingleton(kernel);
 
