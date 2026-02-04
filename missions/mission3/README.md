@@ -9,7 +9,6 @@ Learn how to design and implement sophisticated AI workflows that coordinate mul
 - **Build Multi-Step Workflows**: Create orchestrated processes that chain together SQL queries, vector searches, and AI model calls
 - **Implement Conditional Logic**: Use AI responses to determine next steps in your workflow
 - **Handle Data Transformations**: Process and prepare data between workflow stages
-- **Manage State and Context**: Maintain information across multiple operations in a workflow
 
 ## Prerequisites
 1. Mission 1 completed (embeddings and vector search)
