@@ -66,34 +66,8 @@ Your project must:
 
 ## Submission Requirements
 
-Submit your project by **creating a GitHub Issue** in this repository.
+Submit your project by **[creating a GitHub Issue](https://github.com/microsoft/sql-ai-datathon/issues/new?template=submission.yml)** in this repository.
 
-### How to Submit
-
-1. Go to the **Issues** tab in this repository
-2. Click **New Issue**
-3. Use the title format: `[Submission] Your Project Name`
-4. Include the following in your issue:
-
-```markdown
-**Team/Participant Name:** 
-**Project Type:** (Chatbot / Semantic Search)
-
-**GitHub Repository:** [link to your repo]
-
-**Video Demo:** [link to video]
-
-**Brief Description:**
-(2-3 sentences about what your solution does)
-
-**Tech Stack:**
-- Database: (SQL Server 2025 / Azure SQL)
-- Language: (Python / C# / etc.)
-- AI Service: (Azure OpenAI / etc.)
-
-**Challenges or Tradeoffs:**
-(Optional - any interesting learnings)
-```
 
 ### Repository Requirements
 
@@ -102,7 +76,6 @@ Your linked GitHub repository should contain:
 - Your completed solution
 - Clear setup and run instructions
 - A description of your architecture and approach
-- Notes on any challenges or tradeoffs you encountered
 
 ### Video Demo Requirements
 
@@ -112,12 +85,17 @@ Provide a short demo video that shows:
 - The core user flow (chatting or searching)
 - Evidence that SQL data is being retrieved and used by the AI
 
+Options for hosting your video:
+- YouTube (unlisted is fine)
+- Vimeo
+- Any other accessible video hosting platform
+
 Guidelines:
 - No voice narration required
 - Screen recording is sufficient
 - 2–5 minutes is recommended
 
-If you feel stuck, simplify. A clear, working RAG flow is better than a complex, incomplete solution.
+> IMPORTANT: Be sure to verify that your video link works before submitting! To verify, open the link in a private/incognito browser window.
 
 
 ## What We’re Looking For
