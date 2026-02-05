@@ -5,7 +5,6 @@ You will be guided through implementing semantic search capabilities using embed
 - **Convert Text to Vectors**: Use the `AI_GENERATE_EMBEDDINGS()` function with an external model to convert text into high-dimensional vector representations
 - **Store Embeddings**: Store embeddings efficiently in Azure SQL Database
 - **Query with Vector Similarity**: Query the database using `VECTOR_SEARCH` to find semantically related content
-- **Maintain Embeddings**: Keep embeddings updated as data changes
 
 ## Prerequisites
 1. Embedding model access (you can use the free AI Proxy to generate embeddings for free)
@@ -84,15 +83,14 @@ WITH (
 In these next steps, you will be converting prompts and queries into vector representations to perform semantic search and generating responses based on retrieved information. You will need access to the [text-embedding-3-small](https://ai.azure.us/explore/models/text-embedding-3-small/version/2/registry/azure-openai) embedding model and a chat model provider.
 
 There are several embedding model providers available, below are popular options:
-- GitHub Models:
-- You may use the provided free AI Proxy.
+- GitHub Models. You can find quickstart guides on how to use models from [GitHub Models](https://docs.github.com/en/github-models/quickstart)
 - Deploy models with Microsoft Foundry. Docuementation can be found [here](https://learn.microsoft.com/ai/foundry/model-management/deploy-models).
 - Use local models with Ollama or similar tools.
 
 The recommended completion models for this mission are as follows:
 | Purpose | Model | Provider |
 |---------|-------|----------|
-| **Required Embedding Model** | [text-embedding-3-small](https://github.com/marketplace/models/azure-openai/text-embedding-3-small) | Microsoft Foundry / GitHub Models |
+| **Required Embedding Model** | [text-embedding-3-small](https://github.com/marketplace/models/azure-openai/text-embedding-3-small) | Microsoft Foundry / [GitHub Models](https://github.com/marketplace/models/azure-openai/text-embedding-3-small) |
 | Text Generation | [gpt5-mini](https://ai.azure.com/catalog/models/gpt-5-mini) | Microsoft Foundry / [GitHub Models](https://github.com/marketplace/models/azure-openai/gpt-5-mini)|
 | Text Generation | [qwen3](https://ai.azure.com/catalog/models/qwen-qwen3-8b) | Microsoft Foundry/[Ollama](https://ollama.com/library/qwen3) |
 | Text Generation | [Claude Sonnet 4.5](https://ai.azure.com/catalog/models/claude-sonnet-4-5) | Microsoft Foundry |
