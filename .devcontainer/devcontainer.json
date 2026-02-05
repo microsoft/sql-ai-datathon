@@ -1,6 +1,5 @@
 {
   "name": "SQL + AI Datathon",
-  "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces/sql-ai-datathon",
   "features": {
@@ -15,7 +14,7 @@
     1433
   ],
   
-  "postCreateCommand": "python -m venv .venv && . .venv/bin/activate && pip install -r missions/mission3/py/requirements.txt && pip install -r missions/mission4/py/requirements.txt && dotnet tool install -g Microsoft.DataApiBuilder || true && bash .devcontainer/post-create.sh",
+  "postCreateCommand": "python -m venv .venv && . .venv/bin/activate && pip install -r missions/mission3/py/requirements.txt && pip install -r missions/mission4/py/requirements.txt && dotnet tool install -g Microsoft.DataApiBuilder || true" ,
   "customizations": {
     "vscode": {
       "extensions": [
