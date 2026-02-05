@@ -13,9 +13,11 @@ You will be guided through implementing retrieval augmented generation (RAG) cap
 
 
 ## Prerequisites
-1. Mission 1 completed (similar_items table populated, External Model `MyEmbeddingModel` created)
-1. Embedding model access (you can use the free AI Proxy to generate embeddings for free)
-1. Completion model access (you can use the free AI Proxy to generate completions for free)
+Mission 1 completed: 
+    - `similar_items` table populated, 
+    - External Model `MyEmbeddingModel` created,
+    - Embedding model access,
+    - Completion model access
 
 ## Walkthrough
 

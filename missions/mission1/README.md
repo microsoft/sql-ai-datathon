@@ -7,7 +7,7 @@ You will be guided through implementing semantic search capabilities using embed
 - **Query with Vector Similarity**: Query the database using `VECTOR_SEARCH` to find semantically related content
 
 ## Prerequisites
-1. Embedding model access (you can use the free AI Proxy to generate embeddings for free)
+1. Embedding model access, instructions available in the [Select the Embedding and Chat Models](#select-the-embedding-and-chat-models) section below
 
 ## Walkthrough
 
