@@ -70,13 +70,13 @@ SET PREVIEW_FEATURES = ON;
 GO
 ```
 
-2. Download the [sample data from kaggle](https://www.kaggle.com/datasets/mauridb/product-data-from-walmart-usa-with-embeddings?select=walmart-product-with-embeddings-dataset-usa-text-3-small) and unzip it to access the `walmart_ecommerce_product_details.csv` file.
+2. Download the [sample data from kaggle](https://www.kaggle.com/datasets/mauridb/product-data-from-walmart-usa-with-embeddings?select=walmart-product-with-embeddings-dataset-usa-text-3-small) and unzip it to access the `walmart-product-with-embeddings-dataset-usa-text-3-small.csv` file.
 
 3. Load data from Azure Blob Storage or local storage (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/02-load-table.sql" target="_blank">02-load-table.sql</a> for blob storage details and cleanup scripts for mistakes). If you are using local storage, you can use the following command to bulk insert data into your table:
 
 ```sql
 BULK INSERT [dbo].[walmart_ecommerce_product_details]
-FROM 'walmart_ecommerce_product_details.csv'
+FROM 'walmart-product-with-embeddings-dataset-usa-text-3-small.csv'
 WITH (
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
@@ -85,16 +85,15 @@ WITH (
 );
 ```
 
-> You can also use SQL Server Management Studio 21 (SSMS 21), which has a [built-in import wizard](https://learn.microsoft.com/sql/relational-databases/import-export/use-a-format-file-to-bulk-import-data-sql-server?view=sql-server-ver17) to load CSV data directly into your table. 
+> You can also use SQL Server Management Studio 22 (SSMS 22), which has a [built-in import wizard](https://learn.microsoft.com/sql/relational-databases/import-export/use-a-format-file-to-bulk-import-data-sql-server?view=sql-server-ver17) to load CSV data directly into your table. 
 
 
 ## Select the Embedding and Chat Models
-In these next steps, you will be converting prompts and queries into vector representations to perform semantic search and generating responses based on retrieved information. You will need access to the [text-embedding-3-small](https://ai.azure.us/explore/models/text-embedding-3-small/version/2/registry/azure-openai) embedding model and a chat model provider.
+In these next steps, you will be converting prompts and queries into vector representations to perform semantic search and generating responses based on retrieved information. You will need access to the [text-embedding-3-small](https://ai.azure.us/explore/models/text-embedding-3-small/version/2/registry/azure-openai) embedding model and a chat model provider, this walkthrough will use gpt-5-mini.
 
 There are several embedding model providers available, below are popular options:
-- GitHub Models. You can find quickstart guides on how to use models from [GitHub Models](https://docs.github.com/en/github-models/quickstart)
+- GitHub Models, which is free to use. You can find quickstart guides on how to use models from [GitHub Models](https://docs.github.com/en/github-models/quickstart)
 - Deploy models with Microsoft Foundry. Docuementation can be found [here](https://learn.microsoft.com/ai/foundry/model-management/deploy-models).
-- Use local models with Ollama or similar tools.
 
 The recommended completion models for this mission are as follows:
 | Purpose | Model | Provider |
