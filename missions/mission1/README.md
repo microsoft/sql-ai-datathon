@@ -19,7 +19,14 @@ You have a few options to create an SQL Database, click one of the links below f
 - [Docker container with SQL Server 2025 or later](https://learn.microsoft.com/sql/linux/quickstart-install-connect-docker?view=sql-server-ver17&preserve-view=true&tabs=cli&pivots=cs1-bash)
 - [Azure SQL Database instance](https://learn.microsoft.com/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal)
 
+#### Manually create the SQL Server 2025 container in Codespaces
 
+```bash
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong@Passw0rd" \
+  -p 1433:1433 --name sql_server --hostname sql_server \
+  -v /workspaces/sql-ai-datathon:/workspace \
+  -d mcr.microsoft.com/mssql/server:2025-latest
+```
 ## Setting Up the Database
 
 1. Run the following query to create the database and table structure:
