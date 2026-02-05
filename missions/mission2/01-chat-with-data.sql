@@ -89,22 +89,19 @@ DECLARE @prompt NVARCHAR(MAX) = JSON_OBJECT(
             'content': @request
         )
     ),    
-    'temperature': 0.2,
-    'frequency_penalty': 0,
-    'presence_penalty': 0,    
-    'stop': NULL
+    'model': 'gpt-5-mini'
 );
 
 
 -- -----------------------------------------------------------------------------
 -- SECTION 4: Call Azure OpenAI Chat Completion API
 -- -----------------------------------------------------------------------------
--- NOTE: This uses the gpt5-mini model. To use a different model, update "gpt5-mini" in the URL below
+-- NOTE: This uses the gpt-5-mini model. To use a different model, update "gpt-5-mini" in the URL below
 -- and in any other files that reference it (e.g., mission3 notebooks, mission4 apps).
 DECLARE @retval INT, @response NVARCHAR(MAX);
 
 EXEC @retval = sp_invoke_external_rest_endpoint
-    @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt5-mini/chat/completions?api-version=2024-08-01-preview',
+    @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt-5-mini/chat/completions?api-version=2025-04-01-preview',
     @headers = '{"Content-Type":"application/json"}',
     @method = 'POST',
     @credential = [https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/],
@@ -113,7 +110,6 @@ EXEC @retval = sp_invoke_external_rest_endpoint
     @response = @response OUTPUT
     WITH RESULT SETS NONE;
 
-
 -- -----------------------------------------------------------------------------
 -- SECTION 5: Display Results
 -- -----------------------------------------------------------------------------
@@ -121,6 +117,8 @@ EXEC @retval = sp_invoke_external_rest_endpoint
 SELECT @response AS raw_response;
 
 -- Extracted chat message
-SELECT JSON_VALUE(@response, '$.result.choices[0].message.content') AS chat_response;
+SELECT o.[text] AS chat_response
+FROM OPENJSON(@response, '$.result.output[1].content') 
+WITH ([text] NVARCHAR(MAX)) AS o;
 
 

@@ -7,7 +7,7 @@
 --
 -- Prerequisites:
 --   - Mission 1 completed (similar_items table populated)
---   - Azure OpenAI GPT-4 model deployed (API version 2024-12-01-preview+)
+--   - Azure OpenAI GPT-5-mini model deployed (API version 2024-12-01-preview+)
 --   - Database-scoped credentials configured
 --
 -- Configuration:
@@ -28,7 +28,7 @@
 -- How It Works:
 --   1. Builds prompt with product data from vector search
 --   2. Attaches JSON schema to response_format parameter
---   3. Calls GPT-4 with structured output enabled
+--   3. Calls GPT-5-mini with structured output enabled
 --   4. Parses JSON response and joins back to product table
 --   5. Returns enriched results with AI-generated descriptions
 --
@@ -68,7 +68,7 @@ DECLARE @products JSON =
 -- SECTION 3: Build Chat Prompt with System Instructions
 -- -----------------------------------------------------------------------------
 DECLARE @prompt NVARCHAR(MAX) = JSON_OBJECT(
-    'messages': JSON_ARRAY(
+    'input': JSON_ARRAY(
         JSON_OBJECT(
             'role': 'system',
             'content': '
@@ -97,10 +97,7 @@ DECLARE @prompt NVARCHAR(MAX) = JSON_OBJECT(
             'content': @request
         )
     ),    
-    'temperature': 0.2,
-    'frequency_penalty': 0,
-    'presence_penalty': 0,    
-    'stop': NULL
+    'model': 'gpt-5-mini'
 );
 
 
@@ -108,8 +105,8 @@ DECLARE @prompt NVARCHAR(MAX) = JSON_OBJECT(
 -- SECTION 4: Define Structured Output JSON Schema
 -- -----------------------------------------------------------------------------
 DECLARE @js NVARCHAR(MAX) = N'{
-    "type": "json_schema",
-    "json_schema": {
+    "format": {
+        "type": "json_schema",
         "name": "products",
         "strict": true,
         "schema": {
@@ -151,18 +148,18 @@ DECLARE @js NVARCHAR(MAX) = N'{
     }        
 }';
 
-SET @prompt = JSON_MODIFY(@prompt, '$.response_format', JSON_QUERY(@js));
+SET @prompt = JSON_MODIFY(@prompt, '$.text', JSON_QUERY(@js));
 
 
 -- -----------------------------------------------------------------------------
 -- SECTION 5: Call Azure OpenAI Chat Completion API
 -- -----------------------------------------------------------------------------
--- NOTE: This uses the gpt5-mini model. To use a different model, update "gpt5-mini" in the URL below
+-- NOTE: This uses the gpt-5-mini model. To use a different model, update "gpt-5-mini" in the URL below
 -- and in any other files that reference it (e.g., mission3 notebooks, mission4 apps).
 DECLARE @retval INT, @response NVARCHAR(MAX);
 
 EXEC @retval = sp_invoke_external_rest_endpoint
-    @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt5-mini/chat/completions?api-version=2024-12-01-preview',
+    @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt-5-mini/chat/completions?api-version=2025-04-01-preview',
     @headers = '{"Content-Type":"application/json"}',
     @method = 'POST',
     @credential = [https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/],
@@ -189,11 +186,11 @@ SELECT
 FROM 
     #r
 CROSS APPLY
-    OPENJSON(response, '$.result.choices[0].message') WITH (
-        content NVARCHAR(MAX) '$.content'
+    OPENJSON(response, '$.result.output[1].content') WITH (
+        [text] NVARCHAR(MAX) '$.text'
     ) m
 CROSS APPLY
-    OPENJSON(m.content, '$.products') WITH (
+    OPENJSON(m.[text], '$.products') WITH (
         result_position INT,
         id INT,        
         [description] NVARCHAR(MAX),
@@ -214,11 +211,11 @@ SELECT
 FROM 
     #r
 CROSS APPLY
-    OPENJSON(response, '$.result.choices[0].message') WITH (
-        content NVARCHAR(MAX) '$.content'
+    OPENJSON(response, '$.result.output[1].content') WITH (
+        [text] NVARCHAR(MAX) '$.text'
     ) m
 CROSS APPLY
-    OPENJSON(m.content, '$.products') WITH (
+    OPENJSON(m.[text], '$.products') WITH (
         result_position INT,
         id INT,        
         [description] NVARCHAR(MAX),

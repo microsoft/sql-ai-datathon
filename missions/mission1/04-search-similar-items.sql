@@ -35,62 +35,45 @@ DECLARE @text NVARCHAR(MAX) = 'anything for a teenager boy passionate about raci
 
 
 -- -----------------------------------------------------------------------------
--- SECTION 2: Prepare API Request
+-- SECTION 2: Call Azure OpenAI Embedding API
 -- -----------------------------------------------------------------------------
-DECLARE @retval INT, @response NVARCHAR(MAX);
-DECLARE @payload NVARCHAR(MAX);
-SET @payload = JSON_OBJECT('input': @text);
-
-
--- -----------------------------------------------------------------------------
--- SECTION 3: Call Azure OpenAI Embedding API
--- -----------------------------------------------------------------------------
-BEGIN TRY
-    EXEC @retval = sp_invoke_external_rest_endpoint
-        @url = '<OPENAI_URL>/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-03-15-preview',
-        @method = 'POST',
-        @credential = [https://<OPENAI_URL>.openai.azure.com],
-        @payload = @payload,
-        @response = @response OUTPUT;
-END TRY
-BEGIN CATCH
-    SELECT 
-        'SQL' AS error_source, 
-        ERROR_NUMBER() AS error_code,
-        ERROR_MESSAGE() AS error_message;
-    RETURN;
-END CATCH
-
-
--- -----------------------------------------------------------------------------
--- SECTION 4: Handle API Errors
--- -----------------------------------------------------------------------------
-IF (@retval != 0) 
-BEGIN
-    SELECT 
-        'OPENAI' AS error_source, 
-        JSON_VALUE(@response, '$.result.error.code') AS error_code,
-        JSON_VALUE(@response, '$.result.error.message') AS error_message,
-        @response AS error_response;
-    RETURN;
-END;
-
-
--- -----------------------------------------------------------------------------
--- SECTION 5: Store Response for Subsequent Queries
--- -----------------------------------------------------------------------------
-DROP TABLE IF EXISTS dbo.http_response;
-CREATE TABLE dbo.http_response (response JSON);
-INSERT INTO dbo.http_response (response) VALUES (@response);
-
-SELECT * FROM dbo.http_response;
-
-
--- -----------------------------------------------------------------------------
--- SECTION 6: View the Generated Embedding Vector
--- -----------------------------------------------------------------------------
-SELECT TOP(1)
-    JSON_QUERY(response, '$.result.data[0].embedding') AS embedding
-FROM 
-    dbo.http_response;
+SELECT AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingModel);
 GO
+
+
+-- -----------------------------------------------------------------------------
+-- SECTION 1: Configure Search Parameters
+-- -----------------------------------------------------------------------------
+DECLARE @top INT = 50;
+DECLARE @min_similarity DECIMAL(19,16) = 0.75;
+DECLARE @qv VECTOR(1536) = AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingModel);
+
+-- -----------------------------------------------------------------------------
+-- SECTION 3: Execute Vector Similarity Search
+-- -----------------------------------------------------------------------------
+DROP TABLE IF EXISTS similar_items;
+GO
+
+SELECT TOP (10) 
+    w.id,
+    w.product_name,
+    w.description,
+    w.category,
+    r.distance,
+    1 - r.distance AS similarity
+INTO similar_items
+FROM VECTOR_SEARCH(
+    TABLE = dbo.walmart_ecommerce_product_details AS w,
+    COLUMN = embedding,
+    SIMILAR_TO = @qv,
+    METRIC = 'cosine',
+    TOP_N = 10
+) AS r
+WHERE r.distance <= 1 - @min_similarity
+ORDER BY r.distance;
+
+
+-- -----------------------------------------------------------------------------
+-- SECTION 4: Display Results
+-- -----------------------------------------------------------------------------
+SELECT * FROM similar_items;

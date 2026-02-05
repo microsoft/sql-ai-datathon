@@ -75,3 +75,9 @@ GO
 ALTER DATABASE SCOPED CONFIGURATION
 SET PREVIEW_FEATURES = ON;
 GO
+
+--- -----------------------------------------------------------------------------
+-- SECTION 4: Enable External REST Endpoint (Required for sp_invoke_external_rest_endpoint)
+-- -----------------------------------------------------------------------------
+EXECUTE sp_configure 'external rest endpoint enabled', 1;
+RECONFIGURE WITH OVERRIDE;
