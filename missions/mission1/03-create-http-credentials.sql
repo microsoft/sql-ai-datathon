@@ -29,6 +29,10 @@
 -- -----------------------------------------------------------------------------
 -- SECTION 1: Create HTTP Credentials (API Key Method)
 -- -----------------------------------------------------------------------------
+USE ProductDB;
+GO
+
+
 IF NOT EXISTS (SELECT * FROM sys.database_scoped_credentials WHERE [name] = '<OPENAI_URL>')
 BEGIN
     CREATE DATABASE SCOPED CREDENTIAL [<OPENAI_URL>]

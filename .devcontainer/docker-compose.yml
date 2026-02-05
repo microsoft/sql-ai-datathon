@@ -16,6 +16,7 @@ services:
       MSSQL_PID: Developer
     volumes:
       - sqlserver-data:/var/opt/mssql
+      - ..:/data:ro  # Mount workspace files for BULK INSERT
     healthcheck:
       test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$${MSSQL_SA_PASSWORD:-SqlAi_Datathon2026!}" -C -Q "SELECT 1" || exit 1
       interval: 10s

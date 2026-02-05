@@ -7,7 +7,7 @@ Complete all four missions to level up your skills, and add your own creative tw
 
 ## Quick Start
 1. Fork this repo.
-2. Open in Codespaces or local devcontainer.
+2. Clone, or open in Codespaces. 
 3. Complete the missions and repeat for Missions 2, 3, 4.
 4. Learn how to submit an entry for the Open Hack project in [`open-hack.md`](open-hack.md).
 

@@ -43,6 +43,9 @@
 -- -----------------------------------------------------------------------------
 -- SECTION 1: Define User Request
 -- -----------------------------------------------------------------------------
+USE ProductDB;
+GO
+
 DECLARE @request NVARCHAR(MAX) = 'anything for a teenager boy passionate about racing cars? he owns an XBOX, he likes to build stuff';
 
 

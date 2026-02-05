@@ -39,6 +39,11 @@ Returns:
     0           - Success
     -1          - Embedding generation failure
 ================================================================================
+
+USE ProductDB;
+GO
+
+
 */
 create or alter procedure [dbo].[get_embedding]
 @inputText nvarchar(max),

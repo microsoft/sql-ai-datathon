@@ -22,7 +22,8 @@
 -- Index Created:
 --   - vec_idx: DISKANN vector index on embedding column for fast similarity search
 -- =============================================================================
-
+USE ProductDB;
+GO
 
 -- -----------------------------------------------------------------------------
 -- SECTION 1: Prerequisites & Cleanup
@@ -79,20 +80,37 @@ WITH
     CREDENTIAL = [openai_playground]
 );
 GO
+/*
+    Import data
+*/
+bulk insert dbo.[walmart_ecommerce_product_details]
+from 'walmart/walmart-product-with-embeddings-dataset-usa.csv'
+with (
+	data_source = 'openai_playground',
+    format = 'csv',
+    firstrow = 2,
+    codepage = '65001',
+	fieldterminator = ',',
+	rowterminator = '0x0a',
+    fieldquote = '"',
+    batchsize = 1000,
+    tablock
+)
+go
 
 
 -- -----------------------------------------------------------------------------
 -- SECTION 3: Validate File Access
 -- -----------------------------------------------------------------------------
 SELECT * FROM OPENROWSET(
-    BULK 'walmart-product-with-embeddings-dataset-usa.csv',
+    BULK 'walmart-product-with-embeddings-dataset-usa-copy.csv',
     DATA_SOURCE = 'openai_playground',
     SINGLE_CLOB
 ) AS test;
 
 
 -- -----------------------------------------------------------------------------
--- SECTION 4: Import Product Data
+-- SECTION 4: Import Product Data (Skip if already done in Section 2)
 -- -----------------------------------------------------------------------------
 /*
     For local file system: Replace path and remove DATA_SOURCE parameter
@@ -100,12 +118,13 @@ SELECT * FROM OPENROWSET(
 */
 
 BULK INSERT dbo.[walmart_ecommerce_product_details]
-FROM 'walmart-product-with-embeddings-dataset-usa.csv'
+FROM 'walmart-product-with-embeddings-dataset-usa-copy.csv'
+-- Uncomment and use the line below if loading from containerized environment
+-- FROM '/data/walmart-product-with-embeddings-dataset-usa-copy.csv'
 WITH (
     DATA_SOURCE = 'openai_playground',
     FORMAT = 'CSV',
     FIRSTROW = 2,
-    CODEPAGE = '65001',
     FIELDTERMINATOR = ',',
     ROWTERMINATOR = '0x0a',
     FIELDQUOTE = '"',
@@ -113,6 +132,8 @@ WITH (
     TABLOCK
 );
 GO
+
+
 
 
 -- -----------------------------------------------------------------------------

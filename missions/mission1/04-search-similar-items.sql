@@ -28,6 +28,10 @@
 -- -----------------------------------------------------------------------------
 -- SECTION 1: Define Search Query
 -- -----------------------------------------------------------------------------
+USE ProductDB;
+GO
+
+
 DECLARE @text NVARCHAR(MAX) = 'anything for a teenager boy passionate about racing cars? he owns an XBOX, he likes to build stuff';
 
 
