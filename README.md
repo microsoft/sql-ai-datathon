@@ -4,6 +4,7 @@ Welcome to the SQL AI Datathon! You'll complete guided missions that will prepar
 
 Complete all four missions to level up your skills, and add your own creative twist in the Open Hack to be eligible for judging for a ticket to [SQLCon 2026](https://techcon365.com/26sqlcon/)!
 
+[Watch a live walkthrough of the missions on February 12th and 19th](https://developer.microsoft.com/en-us/reactor/series/S-1641/)
 
 ## Quick Start
 1. Fork this repo.
@@ -31,3 +32,7 @@ Complete all four missions to level up your skills, and add your own creative tw
 | **Technical Execution** | Sound implementation, reproducible setup, focused scope, clear documentation |
 | **Insight & Impact** | Meaningful outcomes, depth of analysis, real-world applicability |
 
+## Resources
+- [SQL + AI Datathon: Building Intelligent Apps with SQL Livestream series](https://developer.microsoft.com/en-us/reactor/series/S-1641)
+- [Build AI-powered solutions using SQL Server 2025](https://learn.microsoft.com/training/modules/build-ai-solutions-sql-server)
+- [Intelligent applications and AI with the SQL Database Engine](https://learn.microsoft.com/sql/sql-server/ai/artificial-intelligence-intelligent-applications?view=sql-server-ver17)
