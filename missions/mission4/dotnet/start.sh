@@ -16,10 +16,10 @@ cd "$SCRIPT_DIR"
 # Cleanup function
 cleanup() {
     echo ""
-    echo "🛑 Stopping services..."
+    echo "Stopping services..."
     kill $DAB_PID 2>/dev/null
     kill $DOTNET_PID 2>/dev/null
-    echo "✅ All services stopped"
+    echo "All services stopped"
     exit 0
 }
 

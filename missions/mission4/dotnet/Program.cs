@@ -3,13 +3,17 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using System.Text.Json;
 
-// Load configuration from dab-config.json and .env
-var dabConfig = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText("dab-config.json"));
-var connectionString = dabConfig.GetProperty("data-source").GetProperty("connection-string").GetString()
-    ?? throw new InvalidOperationException("Connection string not found in dab-config.json");
+// Load configuration from .env first (needed for connection string)
+DotNetEnv.Env.Load("../.env");
+
+// Load DAB config for entity mappings
+var dabConfig = JsonSerializer.Deserialize<JsonElement>(File.ReadAllText("../dab-config.json"));
+
+// Get connection string from environment variable (DAB config uses @env('SERVER_CONNECTION_STRING'))
+var connectionString = Environment.GetEnvironmentVariable("SERVER_CONNECTION_STRING")
+    ?? throw new InvalidOperationException("SERVER_CONNECTION_STRING not set in .env file");
 
 // Load AI settings from .env
-DotNetEnv.Env.Load("../.env");
 var aoaiEndpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT") 
     ?? Environment.GetEnvironmentVariable("MODEL_ENDPOINT_URL")
     ?? throw new InvalidOperationException("AZURE_OPENAI_ENDPOINT not set");
@@ -40,10 +44,10 @@ builder.Services.AddCors(options =>
 });
 
 // Configure Semantic Kernel
-// NOTE: This uses the gpt5-mini model. To use a different model, update the model name below
+// NOTE: This uses the gpt-5-mini model. To use a different model, update the model name below
 // and in any other files that reference it (e.g., mission3 notebooks, mission2 SQL scripts).
 var kernelBuilder = Kernel.CreateBuilder();
-kernelBuilder.AddAzureOpenAIChatCompletion("gpt5-mini", aoaiEndpoint, apiKey);
+kernelBuilder.AddAzureOpenAIChatCompletion("gpt-5-mini", aoaiEndpoint, apiKey);
 var kernel = kernelBuilder.Build();
 builder.Services.AddSingleton(kernel);
 

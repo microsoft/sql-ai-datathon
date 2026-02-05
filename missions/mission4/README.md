@@ -1,43 +1,54 @@
 # Mission 4: Building a Full-Stack AI Application
 
-This mission brings together everything you've learned to build a complete, production-ready application with a modern frontend powered by AI-enhanced backend APIs. You'll configure Data API Builder (DAB) to expose your database as REST/GraphQL endpoints and integrate it with a .NET backend and frontend application.
+This mission brings together everything you've learned to build a complete, production-ready application with a modern frontend powered by AI-enhanced backend APIs. You'll configure Data API Builder (DAB) to expose your database as REST/GraphQL endpoints and integrate it with either a .NET or Python backend.
+
+![Screenshot of the SQL AI product application](img/sql-app.png)
 
 ## Overview
 
 Your mission is to **configure DAB** to expose your product catalog, then run the full-stack application that combines:
 - **DAB** for automatic REST/GraphQL APIs from your database
-- **.NET Minimal API** for AI-powered chat and vector search endpoints
+- **Backend API** (.NET or Python) for AI-powered chat and vector search endpoints
 - **Frontend** for a user-friendly product search experience
 
 ## Learning Objectives
 
 - **Configure Data API Builder**: Set up DAB to expose database entities as REST/GraphQL endpoints
 - **Use Environment Variables**: Securely manage connection strings and API keys
-- **Integrate Multiple Services**: Connect DAB, .NET API, and frontend together
+- **Integrate Multiple Services**: Connect DAB, backend API, and frontend together
 - **Test Full-Stack Applications**: Verify end-to-end functionality
 
 ## Prerequisites
 
 1. Missions 1-3 completed (embeddings, RAG, and orchestration)
-2. SQL Server with the `walmart_ecommerce_product_details` table and stored procedures
-3. .NET 9 SDK installed
-4. Data API Builder CLI installed
+2. SQL Server with the `walmart_ecommerce_product_details` table and stored procedures:
+   - `get_embedding` - Generates embeddings using AI_GENERATE_EMBEDDINGS()
+   - `get_similar_items` - Performs vector similarity search
+3. External Model `MyEmbeddingModel` created (from Mission 1)
+4. Choose your backend:
+   - **.NET**: .NET 9+ SDK installed
+   - **Python**: Python 3.10+ with pip
 
 ---
 
 ## Project Structure
 
 ```
-mission4/
 ├── .env                    # Environment variables (connection strings, API keys)
 ├── README.md               # This file
+├── dab-config.json         # DAB configuration
 ├── frontend/
 │   └── index.html          # Single-page frontend application
-└── dotnet/
-    ├── Program.cs          # .NET Minimal API with AI endpoints
-    ├── SqlAiApp.csproj     # Project file
-    ├── dab-config.json     # DAB configuration (YOUR MISSION!)
-    └── start.ps1           # Startup script
+├── dotnet/                 # .NET backend
+│   ├── Program.cs          # .NET Minimal API with AI endpoints
+│   ├── SqlAiApp.csproj     # Project file
+│   ├── start.ps1           # Windows startup script
+│   └── start.sh            # Linux/macOS startup script
+└── py/                     # Python backend
+    ├── main.py             # FastAPI with AI endpoints
+    ├── requirements.txt    # Python dependencies
+    ├── start.ps1           # Windows startup script
+    └── start.sh            # Linux/macOS startup script
 ```
 
 ---
@@ -70,14 +81,14 @@ MODEL_API_KEY=your-api-key-here
 
 ---
 
-## Step 3: Configure DAB (Your Mission!)
+## Step 3: Configure DAB 
 
-Navigate to the `dotnet` folder and configure DAB to expose your products table.
+The `dab-config.json` file is located in the `mission4` folder (not inside `dotnet` or `py`).
 
 ### Initialize DAB
 
 ```bash
-cd dotnet
+cd mission4
 dab init --database-type mssql --connection-string "@env('SERVER_CONNECTION_STRING')" --host-mode development
 ```
 
@@ -155,11 +166,25 @@ Your final configuration should look similar to:
 
 ## Step 4: Run the Application
 
-### Option A: Use the startup script (recommended)
+Choose either the **.NET** or **Python** backend based on your preference.
 
+---
+
+### Option A: .NET Backend
+
+#### Using the startup script (recommended)
+
+**Windows (PowerShell):**
 ```powershell
 cd dotnet
 .\start.ps1
+```
+
+**Linux/macOS (Bash):**
+```bash
+cd dotnet
+chmod +x start.sh
+./start.sh
 ```
 
 This script:
@@ -168,12 +193,11 @@ This script:
 3. Starts the .NET API on port 5001
 4. Opens the frontend in your browser
 
-### Option B: Run manually
+#### Run manually
 
 **Terminal 1 - Start DAB:**
 ```bash
-cd dotnet
-$env:SERVER_CONNECTION_STRING="your-connection-string"
+cd mission4
 dab start
 ```
 
@@ -188,14 +212,74 @@ Open `http://localhost:5001/app`
 
 ---
 
+### Option B: Python Backend
+
+#### Install dependencies
+
+```bash
+cd py
+pip install -r requirements.txt
+```
+
+#### Using the startup script (recommended)
+
+**Windows (PowerShell):**
+```powershell
+cd py
+.\start.ps1
+```
+
+**Linux/macOS (Bash):**
+```bash
+cd py
+chmod +x start.sh
+./start.sh
+```
+
+This script:
+1. Loads environment variables from `.env`
+2. Starts DAB on port 5000
+3. Starts the FastAPI server on port 8000
+4. Opens the frontend in your browser
+
+#### Run manually
+
+**Terminal 1 - Start DAB:**
+```bash
+cd mission4
+dab start
+```
+
+**Terminal 2 - Start Python API:**
+```bash
+cd py
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Browser:**
+Open `http://localhost:8000/app`
+
+---
+
 ## Step 5: Test the Application
 
 ### Available Endpoints
+
+#### .NET Backend (port 5001)
 
 | Service | URL | Description |
 |---------|-----|-------------|
 | Frontend | http://localhost:5001/app | Product search UI |
 | Swagger | http://localhost:5001/swagger | API documentation |
+| DAB REST | http://localhost:5000/api/Products | Direct database access |
+| DAB GraphQL | http://localhost:5000/graphql | GraphQL playground |
+
+#### Python Backend (port 8000)
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| Frontend | http://localhost:8000/app | Product search UI |
+| Swagger | http://localhost:8000/docs | API documentation |
 | DAB REST | http://localhost:5000/api/Products | Direct database access |
 | DAB GraphQL | http://localhost:5000/graphql | GraphQL playground |
 
@@ -211,8 +295,8 @@ Open `http://localhost:5001/app`
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│    Frontend     │────▶│   .NET API      │────▶│   Azure OpenAI  │
-│  (port 5001)    │     │  (port 5001)    │     │                 │
+│    Frontend     │────▶│  Backend API    │────▶│   Azure OpenAI  │
+│                 │     │ (.NET or Python)│     │                 │
 └─────────────────┘     └────────┬────────┘     └─────────────────┘
                                  │
         ┌────────────────────────┼────────────────────────┐
@@ -223,6 +307,11 @@ Open `http://localhost:5001/app`
 │  (port 5000)    │────▶│   (Database)    │◀────│ (Stored Procs)  │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
+
+**Port Summary:**
+- **DAB**: Port 5000 (both backends)
+- **.NET API**: Port 5001
+- **Python API**: Port 8000
 
 ---
 
@@ -241,7 +330,13 @@ Open `http://localhost:5001/app`
 ### Vector search not working
 - Verify the `get_similar_items` stored procedure exists
 - Check that embeddings are populated in the database
-- Ensure Azure OpenAI credentials are correct in `.env`
+- Ensure the external model `MyEmbeddingModel` is created
+- Verify Azure OpenAI credentials are correct in `.env`
+
+### Chat not responding
+- Check Azure OpenAI endpoint and API key in `.env`
+- Verify the `gpt-5-mini` model is deployed
+- Check the backend logs for error messages
 
 ---
 

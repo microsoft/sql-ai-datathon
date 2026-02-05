@@ -35,16 +35,16 @@ $dotnetProcess = Start-Process -FilePath "dotnet" -ArgumentList "run" -WorkingDi
 Start-Sleep -Seconds 3
 
 # Open browser
-Write-Host "🌐 Opening browser..." -ForegroundColor Cyan
+Write-Host "Opening browser..." -ForegroundColor Cyan
 Start-Process "http://localhost:5001/app"
 
 Write-Host ""
 Write-Host "✅ All services started!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Services running:" -ForegroundColor White
-Write-Host "  📊 DAB API:    http://localhost:5000/api/Products" -ForegroundColor Gray
-Write-Host "  🔧 .NET API:   http://localhost:5001/swagger" -ForegroundColor Gray
-Write-Host "  🌐 Frontend:   http://localhost:5001/app" -ForegroundColor Gray
+Write-Host "  DAB API:    http://localhost:5000/api/Products" -ForegroundColor Gray
+Write-Host "  .NET API:   http://localhost:5001/swagger" -ForegroundColor Gray
+Write-Host "  Frontend:   http://localhost:5001/app" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Press Ctrl+C to stop all services..." -ForegroundColor Yellow
 
@@ -54,7 +54,7 @@ try {
         Start-Sleep -Seconds 1
     }
 } finally {
-    Write-Host "`n🛑 Stopping services..." -ForegroundColor Yellow
+    Write-Host "Stopping services..." -ForegroundColor Yellow
     if ($dabProcess -and !$dabProcess.HasExited) {
         Stop-Process -Id $dabProcess.Id -Force -ErrorAction SilentlyContinue
     }

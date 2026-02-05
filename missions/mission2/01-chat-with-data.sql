@@ -106,7 +106,7 @@ EXEC @retval = sp_invoke_external_rest_endpoint
     @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt-5-mini/chat/completions?api-version=2025-04-01-preview',
     @headers = '{"Content-Type":"application/json"}',
     @method = 'POST',
-    @credential = [https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/],
+    @credential = [<OPENAI_URL>],
     @timeout = 120,
     @payload = @prompt,
     @response = @response OUTPUT

@@ -91,10 +91,11 @@ The recommended completion models for this mission are as follows:
 | Purpose | Model | Provider |
 |---------|-------|----------|
 | **Required Embedding Model** | [text-embedding-3-small](https://github.com/marketplace/models/azure-openai/text-embedding-3-small) | Microsoft Foundry / [GitHub Models](https://github.com/marketplace/models/azure-openai/text-embedding-3-small) |
-| Text Generation | [gpt5-mini](https://ai.azure.com/catalog/models/gpt-5-mini) | Microsoft Foundry / [GitHub Models](https://github.com/marketplace/models/azure-openai/gpt-5-mini)|
+| Text Generation | [gpt-5-mini](https://ai.azure.com/catalog/models/gpt-5-mini) | Microsoft Foundry / [GitHub Models](https://github.com/marketplace/models/azure-openai/gpt-5-mini)|
 | Text Generation | [qwen3](https://ai.azure.com/catalog/models/qwen-qwen3-8b) | Microsoft Foundry/[Ollama](https://ollama.com/library/qwen3) |
 | Text Generation | [Claude Sonnet 4.5](https://ai.azure.com/catalog/models/claude-sonnet-4-5) | Microsoft Foundry |
 
+You can get your endpoint and key from the provider you choose. Make sure to have these ready for the next steps. You can find the Microsoft Foundry model keys in the project overview of your Foundry resouce. [Visit the documentation](https://learn.microsoft.com/azure/ai-foundry/foundry-models/how-to/deploy-foundry-models?view=foundry)
 
 ## Store Database Scope Credentials
 
@@ -125,7 +126,8 @@ WITH (
       API_FORMAT = 'Azure OpenAI',
       MODEL_TYPE = EMBEDDINGS,
       MODEL = 'text-embedding-3-small',
-      CREDENTIAL = [https://<OPENAI_URL>.openai.azure.com]
+      CREDENTIAL = [https://<OPENAI_URL>.openai.azure.com],
+      PARAMETERS = '{"dimensions":1536}'
 );
 GO
 ```
@@ -134,7 +136,7 @@ GO
 
 ### Step 1: Generate Search Query Embedding
 
-Run the following script to convert a natural language search query into a vector embedding using `AI_GENERATE_EMBEDDINGS()` (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/04-search-similar-items.sql" target="_blank">04-search-similar-items.sql</a>):
+Run the following script to convert a natural language search query into a vector embedding using `AI_GENERATE_EMBEDDINGS()` and find products semantically similar to your search query (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/04-search-similar-items.sql" target="_blank">04-search-similar-items.sql</a>):
 
 ```sql
 DECLARE @text NVARCHAR(MAX) = 'anything for a teenager boy passionate about racing cars? he owns an XBOX, he likes to build stuff';
@@ -145,13 +147,7 @@ DECLARE @searchVector VECTOR(1536) = AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEm
 -- View the generated embedding
 SELECT @searchVector AS embedding;
 GO
-```
 
-### Step 2: Perform Vector Similarity Search
-
-Run the following script to find products semantically similar to your search query (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/05-get-similar-items.sql" target="_blank">05-get-similar-items.sql</a>):
-
-```sql
 DECLARE @text NVARCHAR(MAX) = 'anything for a teenager boy passionate about racing cars? he owns an XBOX, he likes to build stuff';
 DECLARE @top INT = 50;
 DECLARE @min_similarity DECIMAL(19,16) = 0.75;
@@ -193,4 +189,4 @@ Verify that your semantic search is working correctly by your results from the s
 ## Next Steps
 After completing this mission, you will have implemented a semantic search solution that can find relevant information based on meaning rather than only keywords.
 
-Proceed to [Mission 2: Retrieval Augmented Generation (RAG)](missions/mission2/README.md) to learn how to build an end-to-end RAG pipeline that combines embeddings with language model generation.
+Proceed to [Mission 2: Retrieval Augmented Generation (RAG)](../mission2/README.md) to learn how to build an end-to-end RAG pipeline that combines embeddings with language model generation.

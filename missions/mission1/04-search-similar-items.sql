@@ -35,7 +35,6 @@ DECLARE @text NVARCHAR(MAX) = 'anything for a teenager boy passionate about raci
 -- SECTION 2: Call Azure OpenAI Embedding API
 -- -----------------------------------------------------------------------------
 SELECT AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingModel);
-GO
 
 
 -- -----------------------------------------------------------------------------
@@ -49,7 +48,6 @@ DECLARE @qv VECTOR(1536) = AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingMod
 -- SECTION 4: Execute Vector Similarity Search
 -- -----------------------------------------------------------------------------
 DROP TABLE IF EXISTS similar_items;
-GO
 
 SELECT TOP (10) 
     w.id,
