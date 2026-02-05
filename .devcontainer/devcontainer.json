@@ -1,9 +1,11 @@
 {
   "name": "SQL + AI Datathon",
-  "image": "mcr.microsoft.com/devcontainers/python:3.13-bookworm",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/sql-ai-datathon",
   "features": {
     "ghcr.io/devcontainers/features/dotnet:2": {
-      "version": "9.0"
+      "version": "10.0"
     }
   },
   "forwardPorts": [
@@ -13,12 +15,7 @@
     1433
   ],
   
-  // Preserve SQL Server data between rebuilds
-  "mounts": [
-    "source=sqlserver-data,target=/var/opt/mssql,type=volume"
-  ],
-  
-  "postCreateCommand": "python -m venv .venv && . .venv/bin/activate && pip install -r missions/mission3/py/requirements.txt && pip install -r missions/mission4/py/requirements.txt && dotnet tool install -g Microsoft.DataApiBuilder || true && .devcontainer/post-create.sh",
+  "postCreateCommand": "python -m venv .venv && . .venv/bin/activate && pip install -r missions/mission3/py/requirements.txt && pip install -r missions/mission4/py/requirements.txt && dotnet tool install -g Microsoft.DataApiBuilder || true && bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -26,7 +23,8 @@
         "ms-dotnettools.csharp",
         "ms-dotnettools.csdevkit",
         "ms-python.python",
-        "ms-toolsai.jupyter"
+        "ms-toolsai.jupyter",
+        "GitHub.copilot-chat"
       ],
       "settings": {
         "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
