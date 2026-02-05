@@ -61,7 +61,7 @@ SET PREVIEW_FEATURES = ON;
 GO
 ```
 
-2. Download the [sample data from kaggle](https://www.kaggle.com/datasets/mauridb/product-data-from-walmart-usa-with-embeddings) and unzip it to access the `walmart_ecommerce_product_details.csv` file.
+2. Download the [sample data from kaggle](https://www.kaggle.com/datasets/mauridb/product-data-from-walmart-usa-with-embeddings/versions/3) and unzip it to access the `walmart_ecommerce_product_details.csv` file.
 
 3. Load data from Azure Blob Storage or local storage (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/02-load-table.sql" target="_blank">02-load-table.sql</a> for blob storage details and cleanup scripts for mistakes). If you are using local storage, you can use the following command to bulk insert data into your table:
 
