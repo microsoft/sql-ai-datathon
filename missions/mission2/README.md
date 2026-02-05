@@ -13,7 +13,7 @@ You will be guided through implementing retrieval augmented generation (RAG) cap
 
 
 ## Prerequisites
-1. Mission 1 completed (similar_items table populated)
+1. Mission 1 completed (similar_items table populated, External Model `MyEmbeddingModel` created)
 1. Embedding model access (you can use the free AI Proxy to generate embeddings for free)
 1. Completion model access (you can use the free AI Proxy to generate completions for free)
 
@@ -72,17 +72,14 @@ DECLARE @prompt NVARCHAR(MAX) = JSON_OBJECT(
             'content': @request
         )
     ),    
-    'temperature': 0.2,
-    'frequency_penalty': 0,
-    'presence_penalty': 0,    
-    'stop': NULL
+    'model': 'gpt-5-mini'
 );
 
--- NOTE: This uses the gpt5-mini model. To use a different model, update "gpt5-mini" in the URL.
+-- NOTE: This uses the gpt-5-mini model. To use a different model, update the model name.
 DECLARE @retval INT, @response NVARCHAR(MAX);
 
 EXEC @retval = sp_invoke_external_rest_endpoint
-    @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt5-mini/chat/completions?api-version=2024-08-01-preview',
+    @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/gpt-5-mini/chat/completions?api-version=2025-04-01-preview',
     @headers = '{"Content-Type":"application/json"}',
     @method = 'POST',
     @credential = [https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/],
@@ -91,7 +88,10 @@ EXEC @retval = sp_invoke_external_rest_endpoint
     @response = @response OUTPUT
     WITH RESULT SETS NONE;
 
-SELECT JSON_VALUE(@response, '$.result.choices[0].message.content') AS chat_response;
+-- Extract chat response using OPENJSON
+SELECT o.[text] AS chat_response
+FROM OPENJSON(@response, '$.result.output[1].content') 
+WITH ([text] NVARCHAR(MAX)) AS o;
 ```
 
 ### Step 2: Structured Output from Chat
@@ -120,38 +120,25 @@ Create reusable stored procedures that encapsulate the RAG logic (see <a href="h
 
 #### Procedure 1: Generate Embeddings
 
+This procedure uses `AI_GENERATE_EMBEDDINGS()` with the external model for efficient embedding generation:
+
 ```sql
 CREATE OR ALTER PROCEDURE [dbo].[get_embedding]
 @inputText NVARCHAR(MAX),
 @embedding VECTOR(1536) OUTPUT,
 @error NVARCHAR(MAX) = NULL OUTPUT
 AS
-DECLARE @retval INT;
-DECLARE @payload NVARCHAR(MAX) = JSON_OBJECT('input': @inputText);
-DECLARE @response NVARCHAR(MAX)
-BEGIN TRY
-    EXEC @retval = sp_invoke_external_rest_endpoint
-        @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-03-15-preview',
-        @method = 'POST',
-        @credential = [https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/],
-        @payload = @payload,
-        @response = @response OUTPUT
-        WITH RESULT SETS NONE;
-END TRY
-BEGIN CATCH
-    SET @error = JSON_OBJECT('error':'Embedding:REST', 'error_code':ERROR_NUMBER(), 'error_message':ERROR_MESSAGE())
-    RETURN -1
-END CATCH
+-- Use AI_GENERATE_EMBEDDINGS with the external model
+SET @embedding = AI_GENERATE_EMBEDDINGS(@inputText USE MODEL MyEmbeddingModel);
 
-IF @retval != 0 BEGIN
-    SET @error = JSON_OBJECT('error':'Embedding:OpenAI', 'error_code':@retval, 'error_message':@response)
-    RETURN @retval
-END
-
-DECLARE @re NVARCHAR(MAX) = JSON_QUERY(@response, '$.result.data[0].embedding')
-SET @embedding = CAST(@re AS VECTOR(1536));
-
-RETURN @retval
+IF @embedding IS NULL
+BEGIN
+    SET @error = JSON_OBJECT(
+        'code': 'EmbeddingGenerationFailed',
+        'message': 'Failed to generate embedding for the input text.'
+    );
+    RETURN -1;
+END;
 GO
 ```
 
@@ -165,12 +152,15 @@ CREATE OR ALTER PROCEDURE [dbo].[get_similar_items]
 AS
 DECLARE @top INT = 10
 DECLARE @min_similarity DECIMAL(19,16) = 0.75
-DECLARE @qv VECTOR(1536)
 DECLARE @embedding VECTOR(1536)
+
+-- Generate embedding using the get_embedding procedure
 EXEC dbo.get_embedding @inputText = @inputText, @embedding = @embedding OUTPUT, @error = @error OUTPUT
+
 IF @error IS NOT NULL
     RETURN -1
 
+-- Perform vector similarity search
 SELECT @result = (
     SELECT  
         w.id,

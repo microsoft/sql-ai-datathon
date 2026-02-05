@@ -7,7 +7,7 @@
 --
 -- Prerequisites:
 --   - Mission 1 completed (similar_items table populated)
---   - Azure OpenAI GPT-5-mini model deployed (API version 2024-12-01-preview+)
+--   - Azure OpenAI gpt-5-mini model deployed (API version 2025-04-01-preview)
 --   - Database-scoped credentials configured
 --
 -- Configuration:
@@ -27,10 +27,10 @@
 --
 -- How It Works:
 --   1. Builds prompt with product data from vector search
---   2. Attaches JSON schema to response_format parameter
---   3. Calls GPT-5-mini with structured output enabled
---   4. Parses JSON response and joins back to product table
---   5. Returns enriched results with AI-generated descriptions
+--   2. Attaches JSON schema via $.text.format parameter
+--   3. Calls Azure OpenAI Responses API with structured output enabled
+--   4. Extracts JSON from $.result.output[1].content[0].text path
+--   5. Parses JSON response and joins back to product table
 --
 -- Output Columns:
 --   - id, product_name, description: Original product data

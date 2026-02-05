@@ -2,9 +2,9 @@
 
 You will be guided through implementing semantic search capabilities using embedding models. In this mission, you will:
 
-- **Convert Text to Vectors**: Use an embedding model to convert text into high-dimensional vector representations
+- **Convert Text to Vectors**: Use the `AI_GENERATE_EMBEDDINGS()` function with an external model to convert text into high-dimensional vector representations
 - **Store Embeddings**: Store embeddings efficiently in Azure SQL Database
-- **Query with Vector Similarity**: Query the database using vector similarity to find semantically related content
+- **Query with Vector Similarity**: Query the database using `VECTOR_SEARCH` to find semantically related content
 - **Maintain Embeddings**: Keep embeddings updated as data changes
 
 ## Prerequisites
@@ -116,34 +116,36 @@ SELECT * FROM sys.database_scoped_credentials WHERE [name] = 'https://<OPENAI_UR
 GO
 ```
 
+### Create External Model for Embeddings
+
+Create an external model that enables the `AI_GENERATE_EMBEDDINGS()` function to call Azure OpenAI:
+
+```sql
+CREATE EXTERNAL MODEL MyEmbeddingModel
+WITH (
+      LOCATION = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-05-15',
+      API_FORMAT = 'Azure OpenAI',
+      MODEL_TYPE = EMBEDDINGS,
+      MODEL = 'text-embedding-3-small',
+      CREDENTIAL = [https://<OPENAI_URL>.openai.azure.com]
+);
+GO
+```
+
 ## Your First Semantic Search
 
 ### Step 1: Generate Search Query Embedding
 
-Run the following script to convert a natural language search query into a vector embedding (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/04-get-search-vector.sql" target="_blank">04-get-search-vector.sql</a>):
+Run the following script to convert a natural language search query into a vector embedding using `AI_GENERATE_EMBEDDINGS()` (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/04-search-similar-items.sql" target="_blank">04-search-similar-items.sql</a>):
 
 ```sql
 DECLARE @text NVARCHAR(MAX) = 'anything for a teenager boy passionate about racing cars? he owns an XBOX, he likes to build stuff';
 
-DECLARE @retval INT, @response NVARCHAR(MAX);
-DECLARE @payload NVARCHAR(MAX);
-SET @payload = JSON_OBJECT('input': @text);
+-- Generate embedding using the external model
+DECLARE @searchVector VECTOR(1536) = AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingModel);
 
-EXEC @retval = sp_invoke_external_rest_endpoint
-    @url = 'https://<OPENAI_URL>.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-03-15-preview',
-    @method = 'POST',
-    @credential = [https://<OPENAI_URL>.openai.azure.com],
-    @payload = @payload,
-    @response = @response OUTPUT;
-
-DROP TABLE IF EXISTS dbo.http_response;
-CREATE TABLE dbo.http_response (response JSON);
-INSERT INTO dbo.http_response (response) VALUES (@response);
-
-SELECT TOP(1)
-    JSON_QUERY(response, '$.result.data[0].embedding') AS embedding
-FROM 
-    dbo.http_response;
+-- View the generated embedding
+SELECT @searchVector AS embedding;
 GO
 ```
 
@@ -152,17 +154,14 @@ GO
 Run the following script to find products semantically similar to your search query (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/05-get-similar-items.sql" target="_blank">05-get-similar-items.sql</a>):
 
 ```sql
+DECLARE @text NVARCHAR(MAX) = 'anything for a teenager boy passionate about racing cars? he owns an XBOX, he likes to build stuff';
 DECLARE @top INT = 50;
 DECLARE @min_similarity DECIMAL(19,16) = 0.75;
 
-DROP TABLE IF EXISTS similar_items;
+-- Generate embedding for search query using AI_GENERATE_EMBEDDINGS
+DECLARE @qv VECTOR(1536) = AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingModel);
 
-DECLARE @qv VECTOR(1536) = (
-    SELECT TOP(1)
-        CAST(JSON_QUERY(response, '$.result.data[0].embedding') AS VECTOR(1536)) AS query_vector
-    FROM 
-        dbo.http_response
-);
+DROP TABLE IF EXISTS similar_items;
 
 SELECT TOP (10) 
     w.id,
@@ -177,7 +176,7 @@ FROM VECTOR_SEARCH(
     COLUMN = embedding,
     SIMILAR_TO = @qv,
     METRIC = 'cosine',
-    TOP_N = 10
+    TOP_N = @top
 ) AS r
 WHERE r.distance <= 1 - @min_similarity
 ORDER BY r.distance;

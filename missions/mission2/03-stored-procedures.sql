@@ -5,15 +5,15 @@
 --              and vector similarity search logic for the RAG pipeline.
 --
 -- Prerequisites:
---   - Azure OpenAI endpoint configured with text-embedding-3-small
---   - Database-scoped credentials created
+--   - External model MyEmbeddingModel created (from Mission 1)
 --   - Product table with embeddings populated
 --
--- Configuration:
---   Replace <FOUNDRY_RESOURCE_NAME> with your Azure OpenAI resource name
+-- Key Feature:
+--   Uses AI_GENERATE_EMBEDDINGS() function with the external model instead of
+--   sp_invoke_external_rest_endpoint for simpler, more efficient embedding generation.
 --
 -- Procedures:
---   1. dbo.get_embedding     - Generates vector embedding for input text
+--   1. dbo.get_embedding     - Generates vector embedding using AI_GENERATE_EMBEDDINGS()
 --   2. dbo.get_similar_items - Finds similar products using vector search
 -- =============================================================================
 
@@ -24,17 +24,20 @@ STORED PROCEDURE: dbo.get_embedding
 ================================================================================
 Description:
     Generates a 1536-dimensional vector embedding for input text using 
-    Azure OpenAI's text-embedding-3-small model.
+    the AI_GENERATE_EMBEDDINGS() function with the MyEmbeddingModel external model.
 
 Parameters:
     @inputText   nvarchar(max)   [IN]  - The text to convert into a vector embedding
     @embedding   vector(1536)    [OUT] - The resulting embedding vector
     @error       nvarchar(max)   [OUT] - JSON error object if the operation fails
 
+Implementation:
+    Uses AI_GENERATE_EMBEDDINGS(@inputText USE MODEL MyEmbeddingModel) which calls
+    the Azure OpenAI text-embedding-3-small model via the external model configuration.
+
 Returns:
     0           - Success
-    -1          - REST endpoint failure
-    Non-zero    - OpenAI API error
+    -1          - Embedding generation failure
 ================================================================================
 */
 create or alter procedure [dbo].[get_embedding]
@@ -42,33 +45,15 @@ create or alter procedure [dbo].[get_embedding]
 @embedding vector(1536) output,
 @error nvarchar(max) = null output
 as
-declare @retval int;
-declare @payload nvarchar(max) = json_object('input': @inputText);
-declare @response nvarchar(max)
-begin try
-    exec @retval = sp_invoke_external_rest_endpoint
-        @url = 'https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-03-15-preview',
-        @method = 'POST',
-        @credential = [https://<FOUNDRY_RESOURCE_NAME>.cognitiveservices.azure.com/],
-        @payload = @payload,
-        @response = @response output
-        with result sets none;
-end try
-begin catch
-    set @error = json_object('error':'Embedding:REST', 'error_code':ERROR_NUMBER(), 'error_message':ERROR_MESSAGE())
-    return -1
-end catch
-
-if @retval != 0 begin
-    set @error = json_object('error':'Embedding:OpenAI', 'error_code':@retval, 'error_message':@response)
-    return @retval
-end
-
-declare @re nvarchar(max) = json_query(@response, '$.result.data[0].embedding')
-set @embedding = cast(@re as vector(1536));
-
-return @retval
-go
+SET @embedding = AI_GENERATE_EMBEDDINGS(@inputText USE MODEL MyEmbeddingModel);
+IF @embedding IS NULL
+BEGIN
+    SET @error = JSON_OBJECT(
+        'code': 'EmbeddingGenerationFailed',
+        'message': 'Failed to generate embedding for the input text.'
+    );
+    RETURN -1;
+END;
 
 /*
 Test query for get_embedding:

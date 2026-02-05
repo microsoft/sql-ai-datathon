@@ -7,7 +7,7 @@
 --
 -- Prerequisites:
 --   - Mission 1 completed (similar_items table populated)
---   - Azure OpenAI GPT-4 model deployed
+--   - Azure OpenAI gpt-5-mini model deployed
 --   - Database-scoped credentials configured for OpenAI endpoint
 --
 -- Configuration:
@@ -17,15 +17,17 @@
 --   1. Retrieves products from similar_items table (from vector search)
 --   2. Formats products as JSON array for context
 --   3. Constructs a prompt with system instructions and product data
---   4. Calls GPT-4 to generate a natural language response
---   5. Model explains why each product matches the user's request
+--   4. Calls Azure OpenAI Responses API to generate a natural language response
+--   5. Extracts response from $.result.output[1].content[0].text path
 --
 -- Prompt Structure:
 --   - System: Instructions for product recommendation behavior
 --   - Assistant: Product catalog data in JSON format
 --   - User: The original search query/request
 --
--- Temperature: 0.2 (low creativity, high consistency)
+-- API Format:
+--   Uses Azure OpenAI Responses API (api-version=2025-04-01-preview)
+--   Response path: $.result.output[1].content[0].text
 --
 -- Output:
 --   Natural language response with product recommendations and explanations

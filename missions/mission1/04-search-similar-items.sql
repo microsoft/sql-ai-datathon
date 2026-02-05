@@ -1,30 +1,27 @@
 -- =============================================================================
--- Mission 1: Generate Search Query Embedding
+-- Mission 1: Semantic Search with AI_GENERATE_EMBEDDINGS
 -- =============================================================================
--- Description: Transforms a natural language search query into a vector embedding
---              using Azure OpenAI's text-embedding-3-small model. The resulting
---              vector is stored in a temporary table for use in similarity searches.
+-- Description: Performs end-to-end semantic similarity search by:
+--              1. Generating a vector embedding from a natural language query
+--              2. Using VECTOR_SEARCH to find similar products
+--              Uses AI_GENERATE_EMBEDDINGS() with the MyEmbeddingModel external model.
 --
 -- Prerequisites:
---   - 03-create-http-credentials.sql must be executed first
---   - Azure OpenAI endpoint accessible from SQL Server
---   - Valid database-scoped credentials configured
---
--- Configuration:
---   Replace the following placeholders:
---   - <OPENAI_URL>: Your Azure OpenAI endpoint URL
+--   - 03-create-http-credentials.sql must be executed first (creates External Model)
+--   - Product table with embeddings populated (from 02-load-table.sql)
 --
 -- How It Works:
 --   1. Takes a natural language search query (e.g., "racing car toys for teenagers")
---   2. Calls Azure OpenAI embedding API via sp_invoke_external_rest_endpoint
---   3. Extracts the 1536-dimensional vector from the API response
---   4. Stores the result in dbo.http_response table for subsequent queries
+--   2. Calls AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingModel)
+--   3. Uses VECTOR_SEARCH to find nearest neighbors in embedding space
+--   4. Returns products with similarity above threshold
+--
+-- Key SQL Server 2025 Functions:
+--   - AI_GENERATE_EMBEDDINGS() - Generates embeddings via External Model
+--   - VECTOR_SEARCH() - Performs approximate nearest neighbor search
 --
 -- Output:
---   - dbo.http_response table containing the embedding vector as JSON
---
--- Next Step:
---   Run 05-get-similar-items.sql to perform semantic search using this vector
+--   - similar_items table with matching products and similarity scores
 -- =============================================================================
 
 
@@ -42,14 +39,14 @@ GO
 
 
 -- -----------------------------------------------------------------------------
--- SECTION 1: Configure Search Parameters
+-- SECTION 3: Configure Search Parameters
 -- -----------------------------------------------------------------------------
 DECLARE @top INT = 50;
 DECLARE @min_similarity DECIMAL(19,16) = 0.75;
 DECLARE @qv VECTOR(1536) = AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingModel);
 
 -- -----------------------------------------------------------------------------
--- SECTION 3: Execute Vector Similarity Search
+-- SECTION 4: Execute Vector Similarity Search
 -- -----------------------------------------------------------------------------
 DROP TABLE IF EXISTS similar_items;
 GO
@@ -74,6 +71,6 @@ ORDER BY r.distance;
 
 
 -- -----------------------------------------------------------------------------
--- SECTION 4: Display Results
+-- SECTION 5: Display Results
 -- -----------------------------------------------------------------------------
 SELECT * FROM similar_items;

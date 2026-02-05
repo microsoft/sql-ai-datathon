@@ -1,9 +1,9 @@
 -- =============================================================================
--- Mission 1: Configure HTTP Credentials for Azure OpenAI
+-- Mission 1: Configure Credentials and External Model for Azure OpenAI
 -- =============================================================================
--- Description: Creates database-scoped credentials for secure access to Azure
---              OpenAI endpoints. These credentials are used by sp_invoke_external_rest_endpoint
---              to authenticate API calls for embedding generation.
+-- Description: Creates database-scoped credentials and an external model for 
+--              secure access to Azure OpenAI endpoints. The external model is
+--              used by AI_GENERATE_EMBEDDINGS() to generate vector embeddings.
 --
 -- Prerequisites:
 --   - Azure OpenAI resource deployed with text-embedding-3-small model
@@ -13,13 +13,16 @@
 --   Replace the following placeholders:
 --   - <OPENAI_URL>: Your Azure OpenAI endpoint URL (e.g., https://myresource.openai.azure.com)
 --   - <OPENAI_API_KEY>: Your Azure OpenAI API key
+--   - <FOUNDRY_RESOURCE_NAME>: Your Azure AI Foundry resource name
 --
 -- Security Options:
 --   1. API Key Authentication (shown below)
 --   2. Managed Identity (recommended for production - see commented section)
 --
 -- Usage:
---   Run once after database creation, before executing search queries
+--   Run once after database creation, before executing search queries.
+--   After running, you can use:
+--     AI_GENERATE_EMBEDDINGS(@text USE MODEL MyEmbeddingModel)
 -- =============================================================================
 
 
@@ -73,3 +76,8 @@ WITH (
       PARAMETERS = '{"dimensions":1536}'
 );
 GO
+
+-- -----------------------------------------------------------------------------
+-- SECTION 5: Test External Model for Embeddings
+-- -----------------------------------------------------------------------------
+SELECT AI_GENERATE_EMBEDDINGS('Test text' USE MODEL MyEmbeddingModel)
