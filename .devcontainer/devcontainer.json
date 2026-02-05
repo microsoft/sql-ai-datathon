@@ -1,8 +1,7 @@
 {
   "name": "SQL + AI Datathon",
-  "image": "ghcr.io/azure-samples/python-ms-sql-devcontainer/python-mssql:1.0.0",
+  "image": "mcr.microsoft.com/devcontainers/python:3.13-bookworm",
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/dotnet:2": {
       "version": "9.0"
     }
@@ -10,9 +9,16 @@
   "forwardPorts": [
     8000,
     5000,
-    5001
+    5001,
+    1433
   ],
-  "postCreateCommand": "python -m venv .venv && . .venv/bin/activate && pip install -r missions/mission3/py/requirements.txt && pip install -r missions/mission4/py/requirements.txt && dotnet tool install -g Microsoft.DataApiBuilder || true",
+  
+  // Preserve SQL Server data between rebuilds
+  "mounts": [
+    "source=sqlserver-data,target=/var/opt/mssql,type=volume"
+  ],
+  
+  "postCreateCommand": "python -m venv .venv && . .venv/bin/activate && pip install -r missions/mission3/py/requirements.txt && pip install -r missions/mission4/py/requirements.txt && dotnet tool install -g Microsoft.DataApiBuilder || true && .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
       "extensions": [
