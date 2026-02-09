@@ -1,34 +1,62 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet-mssql
 {
-  "name": "SQL + AI Datathon",
-  "service": "app",
-  "workspaceFolder": "/workspaces/sql-ai-datathon",
-  "features": {
-    "ghcr.io/devcontainers/features/dotnet:2": {
-      "version": "10.0"
-    }
-  },
-  "forwardPorts": [
-    8000,
-    5000,
-    5001,
-    1433
-  ],
-  
-  "postCreateCommand": "python -m venv .venv && . .venv/bin/activate && pip install -r missions/mission3/py/requirements.txt && pip install -r missions/mission4/py/requirements.txt && dotnet tool install -g Microsoft.DataApiBuilder || true" ,
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-mssql.mssql",
-        "ms-dotnettools.csharp",
-        "ms-dotnettools.csdevkit",
-        "ms-python.python",
-        "ms-toolsai.jupyter",
-        "GitHub.copilot-chat"
-      ],
-      "settings": {
-        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-        "python.terminal.activateEnvironment": true
-      }
-    }
-  }
+	"name": "SQL AI Datathon Dev Container",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.12"
+		},
+		"ghcr.io/devcontainers/features/dotnet:2": {
+			"version": "8.0"
+		}
+	},
+	// Configure tool-specific properties.
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": {
+				"mssql.connections": [
+					{
+						"server": "localhost,1433",
+						"database": "",
+						"authenticationType": "SqlLogin",
+						"user": "sa",
+						"password": "P@ssw0rd",
+						"emptyPasswordInput": false,
+						"savePassword": false,
+						"profileName": "mssql-container"
+					}
+				]
+		},
+		// Add the IDs of extensions you want installed when the container is created.
+		"extensions": [
+			"ms-mssql.mssql",
+			"ms-dotnettools.csharp",
+			"ms-python.python",
+			"ms-toolsai.jupyter",
+			"GitHub.copilot-chat"
+		],
+	}
+},
+// Use 'forwardPorts' to make a list of ports inside the container available locally.
+"forwardPorts": [
+	8000,
+	5000,
+	5001,
+	1433
+],
+// "portsAttributes": {
+//		"5001": {
+//			"protocol": "https"
+//		}
+// }
+// postCreateCommand.sh parameters: $1=SA password, $2=dacpac path, $3=sql script(s) path
+"postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/' && dotnet tool install -g Microsoft.DataApiBuilder || true"
+// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+// "remoteUser": "root"
 }
