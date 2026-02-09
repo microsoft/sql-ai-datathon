@@ -11,6 +11,20 @@ You will be guided through implementing semantic search capabilities using embed
 
 ## Walkthrough
 
+### Use SQL Server 2025 in GitHub Codespaces
+This repository is configured to install SQL Server 2025 and the [SQL Server (mssql) VSCode extension](https://marketplace.visualstudio.com/items?itemName=ms-mssql.mssql) in your Codespace environment. If you are using Codespaces, follow these steps to get started in the extension:
+
+1. Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P) and select "SQL Server: Connect".
+2. In the connection dialog, enter the following details:
+   - Server name: `localhost, 1433`
+   - Authentication type: `SQL Login`
+   - Username: `SA`
+   - Password: Check `.devcontainer/devcontainer.json` for the value.
+3. Click "Connect" to establish a connection to your local SQL Server instance.
+
+![Screenshot of the SQL Server connection setup page in VSCode](mssql-connection-setup.png)
+
+
 ### Create a SQL Database
 
 You have a few options to create an SQL Database, click one of the links below for instructions:
@@ -19,14 +33,7 @@ You have a few options to create an SQL Database, click one of the links below f
 - [Docker container with SQL Server 2025 or later](https://learn.microsoft.com/sql/linux/quickstart-install-connect-docker?view=sql-server-ver17&preserve-view=true&tabs=cli&pivots=cs1-bash)
 - [Azure SQL Database instance](https://learn.microsoft.com/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal)
 
-#### Manually create the SQL Server 2025 container in Codespaces
 
-```bash
-docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong@Passw0rd" \
-  -p 1433:1433 --name sql_server --hostname sql_server \
-  -v /workspaces/sql-ai-datathon:/workspace \
-  -d mcr.microsoft.com/mssql/server:2025-latest
-```
 ## Setting Up the Database
 
 > This script is also available in the repo as <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/01-create-table.sql" target="_blank">01-create-table.sql</a>
