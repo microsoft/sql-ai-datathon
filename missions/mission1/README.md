@@ -29,9 +29,9 @@ This repository is configured to install SQL Server 2025 and the [SQL Server (ms
 
 You have a few options to create an SQL Database, click one of the links below for instructions:
 - [Local SQL Server instance with SQL Server 2025 or later, use the free developer edition](https://learn.microsoft.com/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver17#installation-media)
+- [Azure SQL Database instance (free offer)](https://aka.ms/sqlfreeoffer)
 - [Local SQL Server Container with Visual Studio Code extension](https://learn.microsoft.com/sql/tools/visual-studio-code-extensions/mssql/mssql-local-container?view=sql-server-ver17)
 - [Docker container with SQL Server 2025 or later](https://learn.microsoft.com/sql/linux/quickstart-install-connect-docker?view=sql-server-ver17&preserve-view=true&tabs=cli&pivots=cs1-bash)
-- [Azure SQL Database instance](https://learn.microsoft.com/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal)
 
 
 ## Setting Up the Database

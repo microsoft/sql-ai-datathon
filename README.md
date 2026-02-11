@@ -32,7 +32,17 @@ Complete all four missions to level up your skills, and add your own creative tw
 | **Technical Execution** | Sound implementation, reproducible setup, focused scope, clear documentation |
 | **Insight & Impact** | Meaningful outcomes, depth of analysis, real-world applicability |
 
+## Looking for some Inspiration? 
+Check out the Budget Bytes Series, where we build low cost AI applications with SQL: https://aka.ms/budgetbytes
+
+## Get started with SQL Today for Free 
+- [Azure SQL Database Free Tier](https://azure.microsoft.com/free/sql-database/):
+    - Create up to 10 databases
+    - 32 GB of storage and backup storage, per database
+    - 100,000 vCore seconds, per database
+    - Available for the lifetime of your [Azure](https://azure.microsoft.com/free/) subscription 
+
 ## Resources
-- [SQL + AI Datathon: Building Intelligent Apps with SQL Livestream series](https://developer.microsoft.com/en-us/reactor/series/S-1641)
+- [SQL + AI Datathon: Building Intelligent Apps with SQL Livestream series](https://developer.microsoft.com/reactor/series/S-1641)
 - [Build AI-powered solutions using SQL Server 2025](https://learn.microsoft.com/training/modules/build-ai-solutions-sql-server)
 - [Intelligent applications and AI with the SQL Database Engine](https://learn.microsoft.com/sql/sql-server/ai/artificial-intelligence-intelligent-applications?view=sql-server-ver17)
