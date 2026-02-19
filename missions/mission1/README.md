@@ -94,6 +94,13 @@ WITH (
 
 > You can also use SQL Server Management Studio 22 (SSMS 22), which has a [built-in import wizard](https://learn.microsoft.com/sql/relational-databases/import-export/use-a-format-file-to-bulk-import-data-sql-server?view=sql-server-ver17) to load CSV data directly into your table. 
 
+4. After loading the data, create a vector index on the `embedding` column to optimize similarity search queries:
+```
+CREATE VECTOR INDEX vec_idx
+ON dbo.walmart_ecommerce_product_details(embedding)
+WITH (METRIC = 'COSINE', TYPE = 'DISKANN');
+GO
+```
 
 ## Select the Embedding and Chat Models
 In these next steps, you will be converting prompts and queries into vector representations to perform semantic search and generating responses based on retrieved information. You will need access to the [text-embedding-3-small](https://ai.azure.us/explore/models/text-embedding-3-small/version/2/registry/azure-openai) embedding model and a chat model provider, this walkthrough will use [gpt-5-mini](https://ai.azure.com/catalog/models/gpt-5-mini).
@@ -229,6 +236,7 @@ WHERE r.distance <= 1 - @min_similarity
 ORDER BY r.distance;
 
 SELECT * FROM similar_items;
+
 ```
 
 ### Step 3: Experiment with Different Queries
