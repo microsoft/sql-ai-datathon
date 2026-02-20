@@ -1,5 +1,5 @@
 -- =============================================================================
--- Mission 2: Stored Procedures for RAG Pipeline
+-- Mission 3: Stored Procedures for RAG Pipeline
 -- =============================================================================
 -- ⚠️ BEFORE RUNNING: Verify you are connected to ProductDB
 -- =============================================================================
@@ -64,7 +64,6 @@ Test query for get_embedding:
     SELECT @embedding, @error;
 */
 
-GO
 
 /*
 ================================================================================
