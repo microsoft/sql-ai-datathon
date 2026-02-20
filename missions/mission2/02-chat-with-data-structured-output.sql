@@ -134,7 +134,7 @@ DECLARE @json_schema NVARCHAR(MAX) = N'{
 --   'FOUNDRY' - Use Microsoft Foundry 
 --   'GITHUB'  - Use GitHub Models
 -- -----------------------------------------------------------------------------
-DECLARE @provider NVARCHAR(20) = 'FOUNDRY';  -- Change to 'GITHUB' for GitHub Models
+DECLARE @provider NVARCHAR(20) = 'GITHUB';  -- Change to 'GITHUB' for GitHub Models
 
 DECLARE @prompt NVARCHAR(MAX);
 DECLARE @retval INT, @response NVARCHAR(MAX);

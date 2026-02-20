@@ -64,6 +64,7 @@ Test query for get_embedding:
     SELECT @embedding, @error;
 */
 
+GO
 
 /*
 ================================================================================

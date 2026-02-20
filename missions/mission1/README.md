@@ -14,18 +14,21 @@ You will be guided through implementing semantic search capabilities using embed
 ### Use SQL Server 2025 in GitHub Codespaces
 This repository is configured to install SQL Server 2025 and the [SQL Server (mssql) VSCode extension](https://marketplace.visualstudio.com/items?itemName=ms-mssql.mssql) in your Codespace environment. If you are using Codespaces, follow these steps to get started in the extension:
 
-1. Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P) and select "SQL Server: Connect".
-2. In the connection dialog, enter the following details:
-   - Server name: `localhost, 1433`
-   - Authentication type: `SQL Login`
-   - Username: `SA`
-   - Password: Check `.devcontainer/devcontainer.json` for the value.
+1. Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P) and select "SQL Server: Focus on Connections View".
+2. You should see a connection profile for your local SQL Server instance. Click on it to connect. If you don't see it, you can create a new connection profile with the details below:
+    If you do not see a connection profile in the connection dialog, enter the following details:
+    - Server name: `localhost, 1433`
+    - Authentication type: `SQL Login`
+    - Username: `SA`
+    - Password: Check `.devcontainer/devcontainer.json` for the value.
 3. Click "Connect" to establish a connection to your local SQL Server instance.
 
 ![Screenshot of the SQL Server connection setup page in VSCode](mssql-connection-setup.png)
 
 
 ### Create a SQL Database
+
+> You may skip this step if you are using the provided Codespaces environment, as SQL Server 2025 is already installed and running. You can connect to the local instance using the connection details provided in the previous section.
 
 You have a few options to create an SQL Database, click one of the links below for instructions:
 - [Local SQL Server instance with SQL Server 2025 or later, use the free developer edition](https://learn.microsoft.com/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver17#installation-media)
@@ -38,15 +41,25 @@ You have a few options to create an SQL Database, click one of the links below f
 
 > This script is also available in the repo as <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/01-create-table.sql" target="_blank">01-create-table.sql</a>
 
-1. Run the following query to create the database and table structure:
+1. Open a new query window in your SQL client (e.g., VSCode with MSSQL extension, SQL Server Management Studio) and verify you're connected to your SQL Server instance.
+
+1. Run the following query to create the database:
 
 ```sql
 CREATE DATABASE ProductDB;
 GO
+```
 
-USE ProductDB;
-GO
+### Verify Database Context in VSCode
+If using the MSSQL Extension, switch to the newly created database context in order to create the table in the correct database. 
+    - You can do this by clicking on the database name in the bottom right corner of VSCode and selecting `ProductDB` from the list.
 
+### Verify Database Context in SSMS 22
+Navigate to SQL Editor tool bar and select `ProductDB` from the database dropdown menu to switch the context to the newly created database.
+
+1. Run the following script to create a table for storing product details along with their embeddings:
+
+```sql
 DROP TABLE IF EXISTS [dbo].[walmart_ecommerce_product_details];
 
 CREATE TABLE [dbo].[walmart_ecommerce_product_details]
@@ -77,29 +90,39 @@ SET PREVIEW_FEATURES = ON;
 GO
 ```
 
-2. Download the [sample data from kaggle](https://www.kaggle.com/datasets/mauridb/product-data-from-walmart-usa-with-embeddings?select=walmart-product-with-embeddings-dataset-usa-text-3-small) and unzip it to access the `walmart-product-with-embeddings-dataset-usa-text-3-small.csv` file.
+1. Download the [sample data from kaggle](https://www.kaggle.com/datasets/mauridb/product-data-from-walmart-usa-with-embeddings?select=walmart-product-with-embeddings-dataset-usa-text-3-small) and unzip it to access the `walmart-product-with-embeddings-dataset-usa-text-3-small.csv` file.
 
-3. Load data from Azure Blob Storage or local storage (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/02-load-table.sql" target="_blank">02-load-table.sql</a> for blob storage details and cleanup scripts for mistakes). If you are using local storage, you can use the following command to bulk insert data into your table:
+1. Load data from Azure Blob Storage or local storage (see <a href="https://github.com/microsoft/sql-ai-datathon/blob/main/missions/mission1/02-load-table.sql" target="_blank">02-load-table.sql</a> for blob storage details and cleanup scripts for mistakes). If you are using local storage, you can use the following command to bulk insert data into your table:
 
 ```sql
-BULK INSERT [dbo].[walmart_ecommerce_product_details]
+BULK INSERT dbo.[walmart_ecommerce_product_details]
 FROM 'walmart-product-with-embeddings-dataset-usa-text-3-small.csv'
 WITH (
+    FORMAT = 'CSV',
     FIRSTROW = 2,
     FIELDTERMINATOR = ',',
-    ROWTERMINATOR = '\n',
+    ROWTERMINATOR = '0x0a',
+    FIELDQUOTE = '"',
+    BATCHSIZE = 1000,
     TABLOCK
 );
+GO
 ```
 
 > You can also use SQL Server Management Studio 22 (SSMS 22), which has a [built-in import wizard](https://learn.microsoft.com/sql/relational-databases/import-export/use-a-format-file-to-bulk-import-data-sql-server?view=sql-server-ver17) to load CSV data directly into your table. 
 
-4. After loading the data, create a vector index on the `embedding` column to optimize similarity search queries:
-```
+1. After loading the data, create a vector index on the `embedding` column to optimize similarity search queries:
+
+```sql
 CREATE VECTOR INDEX vec_idx
 ON dbo.walmart_ecommerce_product_details(embedding)
 WITH (METRIC = 'COSINE', TYPE = 'DISKANN');
 GO
+```
+
+1. Verify that the data has been loaded correctly by running a simple query:
+```sql
+SELECT * FROM dbo.walmart_ecommerce_product_details;
 ```
 
 ## Select the Embedding and Chat Models
