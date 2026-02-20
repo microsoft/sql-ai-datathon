@@ -3,7 +3,7 @@
 Welcome to the SQL + AI Datathon Open Hack! This challenge is your opportunity to apply what you learned across the four missions and build a focused, end‑to‑end SQL + AI solution.
 
 ## Objective
-You will choose one project type, implement a core SQL + AI pattern using Retrieval‑Augmented Generation (RAG), and submit a well‑documented solution.
+You will choose one project type, implement a core SQL + AI pattern using Retrieval‑Augmented Generation (RAG), and submit a well‑documented solution. **Submissions are due  by February 26 at 11:59 PM PT**
 
 Your solution must:
 

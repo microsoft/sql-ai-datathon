@@ -11,6 +11,7 @@ Complete all four missions to level up your skills, and add your own creative tw
 2. Clone, or open in Codespaces. 
 3. Complete all missions, 1-4.
 4. Learn how to submit an entry for the Open Hack project in [`open-hack.md`](open-hack.md).
+5. Submit your project by **February 26 at 11:59 PM PT**
 
 ## Mission Briefs
 1. [Embeddings & Search](missions/mission1/README.md) ([folder](missions/mission1))
